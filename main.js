@@ -1,11 +1,23 @@
 // ==========================================================================
-// ENVIRONMENT VARIABLES CONFIGURATION (SUPABASE)
+// SUPABASE CLIENT INITIALIZATION
 // ==========================================================================
-const SUPABASE_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || process.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || process.env.VITE_SUPABASE_ANON_KEY;
+// Kama unatumia Vanilla JS ya kawaida (No bundler), weka funguo zako hapa moja kwa moja kwenye mabano:
+// Mfano: const SUPABASE_URL = "https://ivowgvwswkifnlpkqsz.supabase.co";
+const SUPABASE_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || "https://ivowgvwswkifnlpkqsz.supabase.co";
+const SUPABASE_ANON_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || "WEKA_PUBLISHABLE_KEY_YAKO_HAPA";
 
-// Initialize Supabase Client Connection
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabaseClient = null;
+
+// Kuhakikisha makosa ya Supabase CDN hayasimamishi kodi nyingine ya GitHub
+try {
+  if (typeof window !== 'undefined' && window.supabase) {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } else if (typeof supabase !== 'undefined') {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+} catch (e) {
+  console.error("Supabase initialization failed, checking local fallbacks:", e);
+}
 
 // DOM Elements Configuration
 const verifyBtn = document.getElementById('verifyBtn');
@@ -79,6 +91,7 @@ if (verifyBtn) {
 }
 
 function showStatus(targetBox, message, type) {
+  if (!targetBox) return;
   targetBox.innerText = message;
   targetBox.className = `status-box status-${type}`;
   targetBox.style.display = 'block';
@@ -109,12 +122,17 @@ if (submitFeedbackBtn) {
       return;
     }
 
+    if (!supabaseClient) {
+      showStatus(feedStatusBox, 'Database connection error. Setup keys correctly.', 'error');
+      return;
+    }
+
     submitFeedbackBtn.innerText = "SENDING TICKET...";
     submitFeedbackBtn.disabled = true;
-    feedStatusBox.style.display = 'none';
+    if (feedStatusBox) feedStatusBox.style.display = 'none';
 
     // Transmit new payload to Supabase database infrastructure
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('support_tickets')
       .insert([{ name: name, phone: phone, message: message }]);
 
@@ -122,7 +140,6 @@ if (submitFeedbackBtn) {
       showStatus(feedStatusBox, 'Database transmission error: ' + error.message, 'error');
     } else {
       showStatus(feedStatusBox, '✓ Support ticket logged successfully! Our team has received your logs.', 'success');
-      // Safisha fomu baada ya kutuma vizuri
       feedName.value = '';
       feedPhone.value = '';
       feedMessage.value = '';
@@ -143,7 +160,12 @@ if (adminFeedbackContainer) {
 async function renderAdminTickets() {
   adminFeedbackContainer.innerHTML = '<div class="no-data">Fetching cloud records...</div>';
 
-  const { data: tickets, error } = await supabase
+  if (!supabaseClient) {
+    adminFeedbackContainer.innerHTML = '<div class="no-data" style="color:#f87171;">Supabase Client not connected. Check keys.</div>';
+    return;
+  }
+
+  const { data: tickets, error } = await supabaseClient
     .from('support_tickets')
     .select('*')
     .order('created_at', { ascending: false });
@@ -177,8 +199,9 @@ async function renderAdminTickets() {
 
 // Global scope initialization for table row purging
 window.deleteTicket = async function(id) {
+  if (!supabaseClient) return;
   if (confirm("Are you sure you want to mark this ticket as resolved and delete it?")) {
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('support_tickets')
       .delete()
       .eq('id', id);
