@@ -1,8 +1,8 @@
 // ==========================================================================
 // ENVIRONMENT VARIABLES CONFIGURATION (SUPABASE)
 // ==========================================================================
-const SUPABASE_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || "https://ivowgvwswkifnlpkqsz.supabase.co";
-const SUPABASE_ANON_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || "WEKA_PUBLISHABLE_KEY_YAKO_HAPA";
+const SUPABASE_URL = import.meta?.env?.VITE_SUPABASE_URL || "https://ivowgvwswkifnlpkqsz.supabase.co";
+const SUPABASE_ANON_KEY = import.meta?.env?.VITE_SUPABASE_ANON_KEY || "sb_publishable_wl8XoqViGKRKT3w7KnnK8g_gq2QOxGL";
 
 let supabaseClient = null;
 
@@ -30,8 +30,8 @@ const feedStatusBox = document.getElementById('feedStatusBox');
 const adminFeedbackContainer = document.getElementById('adminFeedbackContainer');
 
 /* ==========================================================================
-   HELPER UTILITY: NUKTA 5 LOADING ANIMATION
-   ========================================================================== */
+    HELPER UTILITY: NUKTA 5 LOADING ANIMATION
+    ========================================================================== */
 function runDotAnimation(element, baseText) {
   let count = 0;
   return setInterval(() => {
@@ -41,8 +41,8 @@ function runDotAnimation(element, baseText) {
 }
 
 /* ==========================================================================
-   1. GITHUB AUTHENTICATION & AUTOMATIC DEPLOYMENT ENGINE
-   ========================================================================== */
+    1. GITHUB AUTHENTICATION & AUTOMATIC DEPLOYMENT ENGINE
+    ========================================================================== */
 if (verifyBtn) {
   verifyBtn.addEventListener('click', async () => {
     const username = usernameInput.value.trim();
@@ -60,7 +60,12 @@ if (verifyBtn) {
 
     try {
       // Step A: Verification of Profile Integrity via public bio signature
-      const userResponse = await fetch(`https://api.github.com/users/${username}`);
+      const userResponse = await fetch(`https://api.github.com/users/${username}`, {
+        headers: {
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+      
       if (!userResponse.ok) {
         clearInterval(authAnimation); // Simamisha loading
         showStatus(statusBox, `Account verification failed. Redirecting to fork project...`, 'error');
@@ -78,7 +83,12 @@ if (verifyBtn) {
       }
 
       // Step B: Verification of Repository Fork Allocation Status
-      const repoResponse = await fetch(`https://api.github.com/repos/${username}/NOVA-XMD`);
+      const repoResponse = await fetch(`https://api.github.com/repos/${username}/NOVA-XMD`, {
+        headers: {
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+      
       if (repoResponse.ok) {
         const repoData = await repoResponse.json();
         
@@ -97,6 +107,7 @@ if (verifyBtn) {
       }
     } catch (error) {
       clearInterval(authAnimation); // Simamisha loading
+      console.error('Verification error:', error);
       showStatus(statusBox, 'An API connection error occurred. Please try again.', 'error');
     } finally {
       clearInterval(authAnimation); // Kuhakikisha imesimama kabisa
@@ -120,8 +131,8 @@ function triggerRedirect(url) {
 }
 
 /* ==========================================================================
-   2. FEEDBACK & SUPPORT TICKET OPERATIONS (SUPABASE PRODUCTION)
-   ========================================================================== */
+    2. FEEDBACK & SUPPORT TICKET OPERATIONS (SUPABASE PRODUCTION)
+    ========================================================================== */
 if (submitFeedbackBtn) {
   submitFeedbackBtn.addEventListener('click', async () => {
     const name = feedName.value.trim();
@@ -140,6 +151,7 @@ if (submitFeedbackBtn) {
 
     if (!supabaseClient) {
       showStatus(feedStatusBox, 'Database connection error. Setup keys correctly.', 'error');
+      console.error('Supabase client not initialized');
       return;
     }
 
@@ -151,13 +163,14 @@ if (submitFeedbackBtn) {
 
     try {
       // Transmit new payload to Supabase database infrastructure
-      const { error } = await supabaseClient
+      const { data, error } = await supabaseClient
         .from('support_tickets')
         .insert([{ name: name, phone: phone, message: message }]);
 
       clearInterval(msgAnimation); // Simamisha loading baada ya kupata majibu kutoka Supabase
 
       if (error) {
+        console.error('Database error:', error);
         showStatus(feedStatusBox, 'Database transmission error: ' + error.message, 'error');
       } else {
         showStatus(feedStatusBox, '✓ Support ticket logged successfully! Our team has received your logs.', 'success');
@@ -167,6 +180,7 @@ if (submitFeedbackBtn) {
       }
     } catch (e) {
       clearInterval(msgAnimation);
+      console.error('Submission error:', e);
       showStatus(feedStatusBox, 'An error occurred during submission. Please retry.', 'error');
     } finally {
       clearInterval(msgAnimation); // Kuhakikisha imesimama
@@ -177,8 +191,8 @@ if (submitFeedbackBtn) {
 }
 
 /* ==========================================================================
-   3. ADMIN DASHBOARD CONTROL MODULES
-   ========================================================================== */
+    3. ADMIN DASHBOARD CONTROL MODULES
+    ========================================================================== */
 if (adminFeedbackContainer) {
   renderAdminTickets();
 }
@@ -191,50 +205,62 @@ async function renderAdminTickets() {
     return;
   }
 
-  const { data: tickets, error } = await supabaseClient
-    .from('support_tickets')
-    .select('*')
-    .order('created_at', { ascending: false });
+  try {
+    const { data: tickets, error } = await supabaseClient
+      .from('support_tickets')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  if (error) {
-    adminFeedbackContainer.innerHTML = `<div class="no-data" style="color:#f87171;">Failed to fetch database data: ${error.message}</div>`;
-    return;
+    if (error) {
+      console.error('Fetch error:', error);
+      adminFeedbackContainer.innerHTML = `<div class="no-data" style="color:#f87171;">Failed to fetch database data: ${error.message}</div>`;
+      return;
+    }
+
+    adminFeedbackContainer.innerHTML = '';
+
+    if (!tickets || tickets.length === 0) {
+      adminFeedbackContainer.innerHTML = '<div class="no-data">No active support tickets found in backend database memory.</div>';
+      return;
+    }
+
+    tickets.forEach(ticket => {
+      const formattedDate = new Date(ticket.created_at).toLocaleString();
+      const item = document.createElement('div');
+      item.className = 'feedback-item';
+      item.innerHTML = `
+        <h3>👤 Name: ${ticket.name}</h3>
+        <p><strong>📱 Contact:</strong> +${ticket.phone}</p>
+        <p><strong>📝 Message:</strong> ${ticket.message}</p>
+        <div class="meta">📅 Date Transmitted: ${formattedDate}</div>
+        <button class="delete-btn" onclick="deleteTicket(${ticket.id})">RESOLVED / DELETE</button>
+      `;
+      adminFeedbackContainer.appendChild(item);
+    });
+  } catch (e) {
+    console.error('Render error:', e);
+    adminFeedbackContainer.innerHTML = '<div class="no-data" style="color:#f87171;">An error occurred while rendering tickets.</div>';
   }
-
-  adminFeedbackContainer.innerHTML = '';
-
-  if (!tickets || tickets.length === 0) {
-    adminFeedbackContainer.innerHTML = '<div class="no-data">No active support tickets found in backend database memory.</div>';
-    return;
-  }
-
-  tickets.forEach(ticket => {
-    const formattedDate = new Date(ticket.created_at).toLocaleString();
-    const item = document.createElement('div');
-    item.className = 'feedback-item';
-    item.innerHTML = `
-      <h3>👤 Name: ${ticket.name}</h3>
-      <p><strong>📱 Contact:</strong> +${ticket.phone}</p>
-      <p><strong>📝 Message:</strong> ${ticket.message}</p>
-      <div class="meta">📅 Date Transmitted: ${formattedDate}</div>
-      <button class="delete-btn" onclick="deleteTicket(${ticket.id})">RESOLVED / DELETE</button>
-    `;
-    adminFeedbackContainer.appendChild(item);
-  });
 }
 
 window.deleteTicket = async function(id) {
   if (!supabaseClient) return;
   if (confirm("Are you sure you want to mark this ticket as resolved and delete it?")) {
-    const { error } = await supabaseClient
-      .from('support_tickets')
-      .delete()
-      .eq('id', id);
+    try {
+      const { error } = await supabaseClient
+        .from('support_tickets')
+        .delete()
+        .eq('id', id);
 
-    if (error) {
-      alert("Error deleting ticket: " + error.message);
-    } else {
-      renderAdminTickets();
+      if (error) {
+        console.error('Delete error:', error);
+        alert("Error deleting ticket: " + error.message);
+      } else {
+        renderAdminTickets();
+      }
+    } catch (e) {
+      console.error('Delete exception:', e);
+      alert("An error occurred while deleting the ticket");
     }
   }
 };
