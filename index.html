@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova Xmd - Authentication & Support Gate</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <div class="card">
+    <div class="logo-container">
+      <img src="https://url.bmbxmd.workers.dev/bmbbot.png" alt="Nova Xmd Logo">
+    </div>
+
+    <h1>Nova Xmd <span>Auth</span></h1>
+    <div class="badge">🛡️ Verification Gate</div>
+    <div class="subtitle">Verify your GitHub fork status. Successful verification will automatically trigger Heroku deployment.</div>
+
+    <div class="input-group">
+      <span class="input-label">🐙 GitHub Username</span>
+      <input id="username" type="text" placeholder="Enter your github username..." autocomplete="off">
+    </div>
+
+    <button id="verifyBtn">VERIFY & DEPLOY</button>
+    <div id="statusBox" class="status-box"></div>
+  </div>
+
+  <div class="card">
+    <h1>Get <span>Support</span></h1>
+    <div class="badge">💬 Help Desk</div>
+    <div class="subtitle">Need assistance? Drop your details and message below, our team will look into it.</div>
+
+    <div class="input-group">
+      <span class="input-label">👤 Full Name</span>
+      <input id="feedName" type="text" placeholder="Enter your name...">
+    </div>
+
+    <div class="input-group">
+      <span class="input-label">📱 Phone Number (With Country Code)</span>
+      <input id="feedPhone" type="tel" placeholder="e.g., 255700000000">
+    </div>
+
+    <div class="input-group">
+      <span class="input-label">✉️ Message / Issue</span>
+      <textarea id="feedMessage" placeholder="Describe your issue or feedback here..."></textarea>
+    </div>
+
+    <button id="submitFeedbackBtn">SUBMIT SUPPORT TICKET</button>
+    <div id="feedStatusBox" class="status-box"></div>
+
+    <div class="footer">
+      ⚡ Powered by <span>Nova Xmd Core</span>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
