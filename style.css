@@ -21,7 +21,7 @@ body {
   padding: 40px 15px;
 }
 
-/* Containers */
+/* UI Containers */
 .card {
   position: relative;
   width: 100%;
@@ -48,7 +48,7 @@ body {
   box-shadow: 0 0 15px #a855f7;
 }
 
-/* Typography & Badges */
+/* Identity & Badges */
 .logo-container {
   display: inline-flex;
   align-items: center;
@@ -106,7 +106,7 @@ h1 span {
   margin-bottom: 30px;
 }
 
-/* Form Inputs & Groups */
+/* Inputs Architecture */
 .input-group {
   text-align: left;
   margin-bottom: 20px;
@@ -146,7 +146,7 @@ input:focus, textarea:focus {
   background: rgba(168, 85, 247, 0.05);
 }
 
-/* Buttons */
+/* Interactive Elements */
 button, .action-btn {
   width: 100%;
   padding: 16px;
@@ -176,7 +176,7 @@ button, .action-btn {
   box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
 }
 
-/* Status Notifications */
+/* Notification Feedback Modules */
 .status-box {
   margin-top: 20px;
   padding: 15px;
@@ -206,7 +206,7 @@ button, .action-btn {
   color: #f87171;
 }
 
-/* Admin Panel Specific Styles */
+/* Admin Dashboard Elements */
 .admin-card {
   max-width: 800px;
 }
