@@ -111,6 +111,7 @@ if (submitFeedbackBtn) {
 
     submitFeedbackBtn.innerText = "SENDING TICKET...";
     submitFeedbackBtn.disabled = true;
+    feedStatusBox.style.display = 'none';
 
     // Transmit new payload to Supabase database infrastructure
     const { error } = await supabase
@@ -121,6 +122,7 @@ if (submitFeedbackBtn) {
       showStatus(feedStatusBox, 'Database transmission error: ' + error.message, 'error');
     } else {
       showStatus(feedStatusBox, '✓ Support ticket logged successfully! Our team has received your logs.', 'success');
+      // Safisha fomu baada ya kutuma vizuri
       feedName.value = '';
       feedPhone.value = '';
       feedMessage.value = '';
