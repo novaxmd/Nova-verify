@@ -1,14 +1,11 @@
 // ==========================================================================
-// SUPABASE CLIENT INITIALIZATION
+// ENVIRONMENT VARIABLES CONFIGURATION (SUPABASE)
 // ==========================================================================
-// Kama unatumia Vanilla JS ya kawaida (No bundler), weka funguo zako hapa moja kwa moja kwenye mabano:
-// Mfano: const SUPABASE_URL = "https://ivowgvwswkifnlpkqsz.supabase.co";
 const SUPABASE_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || "https://ivowgvwswkifnlpkqsz.supabase.co";
 const SUPABASE_ANON_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || "WEKA_PUBLISHABLE_KEY_YAKO_HAPA";
 
 let supabaseClient = null;
 
-// Kuhakikisha makosa ya Supabase CDN hayasimamishi kodi nyingine ya GitHub
 try {
   if (typeof window !== 'undefined' && window.supabase) {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -16,7 +13,7 @@ try {
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
 } catch (e) {
-  console.error("Supabase initialization failed, checking local fallbacks:", e);
+  console.error("Supabase initialization failed:", e);
 }
 
 // DOM Elements Configuration
@@ -33,6 +30,17 @@ const feedStatusBox = document.getElementById('feedStatusBox');
 const adminFeedbackContainer = document.getElementById('adminFeedbackContainer');
 
 /* ==========================================================================
+   HELPER UTILITY: NUKTA 5 LOADING ANIMATION
+   ========================================================================== */
+function runDotAnimation(element, baseText) {
+  let count = 0;
+  return setInterval(() => {
+    count = (count + 1) % 6; // Itazunguka kuanzia 0 hadi 5
+    element.innerText = baseText + ".".repeat(count);
+  }, 250); // Kila baada ya robo sekunde nukta inaongezeka
+}
+
+/* ==========================================================================
    1. GITHUB AUTHENTICATION & AUTOMATIC DEPLOYMENT ENGINE
    ========================================================================== */
 if (verifyBtn) {
@@ -44,14 +52,17 @@ if (verifyBtn) {
       return;
     }
 
-    verifyBtn.innerText = "VERIFYING METADATA...";
     verifyBtn.disabled = true;
     statusBox.style.display = 'none';
+    
+    // Anzisha loading ya nukta 5 hapa
+    const authAnimation = runDotAnimation(verifyBtn, "VERIFYING METADATA");
 
     try {
       // Step A: Verification of Profile Integrity via public bio signature
       const userResponse = await fetch(`https://api.github.com/users/${username}`);
       if (!userResponse.ok) {
+        clearInterval(authAnimation); // Simamisha loading
         showStatus(statusBox, `Account verification failed. Redirecting to fork project...`, 'error');
         triggerRedirect("https://github.com/novaxmd/NOVA-XMD/fork");
         return;
@@ -61,6 +72,7 @@ if (verifyBtn) {
       const userBio = userData.bio ? userData.bio.toUpperCase() : "";
 
       if (!userBio.includes("NOVA-XMD") && !userBio.includes("BMB")) {
+        clearInterval(authAnimation); // Simamisha loading
         showStatus(statusBox, `❌ Identity Verification Failed! Add "NOVA-XMD" or "BMB" to your GitHub profile Bio to verify you own this account.`, 'error');
         return;
       }
@@ -70,6 +82,7 @@ if (verifyBtn) {
       if (repoResponse.ok) {
         const repoData = await repoResponse.json();
         
+        clearInterval(authAnimation); // Simamisha loading kabla ya mafanikio
         if (repoData.fork === true || repoData.name.toLowerCase() === 'nova-xmd') {
           showStatus(statusBox, `✓ Ownership Confirmed! Redirecting to Heroku Deployment...`, 'success');
           triggerRedirect("https://dashboard.heroku.com/new?template=https://github.com/novaxmd/NOVA-XMD");
@@ -78,12 +91,15 @@ if (verifyBtn) {
           triggerRedirect("https://github.com/novaxmd/NOVA-XMD/fork");
         }
       } else {
+        clearInterval(authAnimation); // Simamisha loading
         showStatus(statusBox, `❌ Repository fork not found. Launching Fork interface...`, 'error');
         triggerRedirect("https://github.com/novaxmd/NOVA-XMD/fork");
       }
     } catch (error) {
+      clearInterval(authAnimation); // Simamisha loading
       showStatus(statusBox, 'An API connection error occurred. Please try again.', 'error');
     } finally {
+      clearInterval(authAnimation); // Kuhakikisha imesimama kabisa
       verifyBtn.innerText = "VERIFY & DEPLOY";
       verifyBtn.disabled = false;
     }
@@ -127,26 +143,36 @@ if (submitFeedbackBtn) {
       return;
     }
 
-    submitFeedbackBtn.innerText = "SENDING TICKET...";
     submitFeedbackBtn.disabled = true;
     if (feedStatusBox) feedStatusBox.style.display = 'none';
 
-    // Transmit new payload to Supabase database infrastructure
-    const { error } = await supabaseClient
-      .from('support_tickets')
-      .insert([{ name: name, phone: phone, message: message }]);
+    // Anzisha loading ya nukta 5 hapa pia
+    const msgAnimation = runDotAnimation(submitFeedbackBtn, "SENDING TICKET");
 
-    if (error) {
-      showStatus(feedStatusBox, 'Database transmission error: ' + error.message, 'error');
-    } else {
-      showStatus(feedStatusBox, '✓ Support ticket logged successfully! Our team has received your logs.', 'success');
-      feedName.value = '';
-      feedPhone.value = '';
-      feedMessage.value = '';
+    try {
+      // Transmit new payload to Supabase database infrastructure
+      const { error } = await supabaseClient
+        .from('support_tickets')
+        .insert([{ name: name, phone: phone, message: message }]);
+
+      clearInterval(msgAnimation); // Simamisha loading baada ya kupata majibu kutoka Supabase
+
+      if (error) {
+        showStatus(feedStatusBox, 'Database transmission error: ' + error.message, 'error');
+      } else {
+        showStatus(feedStatusBox, '✓ Support ticket logged successfully! Our team has received your logs.', 'success');
+        feedName.value = '';
+        feedPhone.value = '';
+        feedMessage.value = '';
+      }
+    } catch (e) {
+      clearInterval(msgAnimation);
+      showStatus(feedStatusBox, 'An error occurred during submission. Please retry.', 'error');
+    } finally {
+      clearInterval(msgAnimation); // Kuhakikisha imesimama
+      submitFeedbackBtn.innerText = "SUBMIT SUPPORT TICKET";
+      submitFeedbackBtn.disabled = false;
     }
-
-    submitFeedbackBtn.innerText = "SUBMIT SUPPORT TICKET";
-    submitFeedbackBtn.disabled = false;
   });
 }
 
@@ -197,7 +223,6 @@ async function renderAdminTickets() {
   });
 }
 
-// Global scope initialization for table row purging
 window.deleteTicket = async function(id) {
   if (!supabaseClient) return;
   if (confirm("Are you sure you want to mark this ticket as resolved and delete it?")) {
