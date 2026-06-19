@@ -15,27 +15,36 @@ jobs:
       - name: Install Unzip
         run: sudo apt-get install -y unzip
 
-      - name: Extract Project Files
+      - name: Clean Old Files and Extract New Project
         run: |
-          # 1. Create a temporary folder and unzip there
+          # 1. Create a temporary folder and move project.zip there safely
           mkdir temp_extracted
-          unzip -o project.zip -d temp_extracted/
+          cp project.zip temp_extracted/
           
-          # 2. Find the first folder inside temp_extracted (whatever its name)
+          # 2. Delete all old files and folders in the root directory
+          # We use find to avoid deleting the .git folder or temp_extracted
+          find . -maxdepth 1 ! -name '.' ! -name '.git' ! -name 'temp_extracted' -exec rm -rf {} +
+          
+          # 3. Move project.zip back to root from temp, then extract
+          mv temp_extracted/project.zip ./
+          unzip -o project.zip -d temp_extracted/
+          rm -f temp_extracted/project.zip # remove the copy inside temp
+          
+          # 4. Find the first folder inside temp_extracted (whatever its name)
           INTERNAL_FOLDER=$(find temp_extracted -maxdepth 1 -mindepth 1 -type d | head -n 1)
           
-          # 3. If a folder was found, move everything inside it to the root
+          # 5. If a folder was found, move everything inside it to the root
           if [ -n "$INTERNAL_FOLDER" ]; then
             echo "Moving files from: $INTERNAL_FOLDER"
             mv "$INTERNAL_FOLDER"/* ./ 2>/dev/null || true
             mv "$INTERNAL_FOLDER"/.* ./ 2>/dev/null || true
           else
-            # If no inner folder (files are already directly inside), move them directly
+            # If no inner folder, move them directly
             mv temp_extracted/* ./ 2>/dev/null || true
             mv temp_extracted/.* ./ 2>/dev/null || true
           fi
           
-          # 4. Clean up
+          # 6. Clean up temporary extraction folder and the zip file
           rm -rf temp_extracted
           rm -f project.zip
 
@@ -43,6 +52,8 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add .
-          git commit -m "Extract all sub-folders (src, public, etc) automatically" || exit 0
+          
+          # Git add -A itachukua mafaili yaliyofutwa (deletions) na mapya pia
+          git add -A
+          git commit -m "Clean old files and extract new sub-folders automatically" || exit 0
           git push
