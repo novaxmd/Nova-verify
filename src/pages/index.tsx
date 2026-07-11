@@ -60,6 +60,11 @@ export default function HomePage() {
       return "Start with your country code, e.g. +255 or 255";
     }
 
+    // Wait until at least 3 digits are typed before flagging an unknown
+    // code — this gives the user room to finish typing their country code
+    // (e.g. "+2", "+25" are incomplete, not wrong) before we judge it.
+    if (digitsOnly.length < 3) return "";
+
     const matchesKnownCode = sortedCodes.some((code) => digitsOnly.startsWith(code));
     if (!matchesKnownCode) {
       return "Start with your country code, e.g. +255 or 255";
@@ -73,6 +78,15 @@ export default function HomePage() {
   const closeModal = () => setModal((m) => ({ ...m, open: false }));
 
   const handleSubmit = async () => {
+    const digitsOnly = phone.trim().replace(/\D/g, "");
+    if (digitsOnly.length < 8) {
+      const msg = digitsOnly.length === 0
+        ? "Please enter your phone number"
+        : "Start with your country code, e.g. +255 or 255";
+      setPhoneError(msg);
+      setModal({ open: true, icon: "fa-triangle-exclamation", message: msg, isError: true });
+      return;
+    }
     const validationError = validatePhone(phone);
     if (validationError) {
       setPhoneError(validationError);
