@@ -13,6 +13,7 @@ import type { Contact } from "@/types";
 export default function AdminPage() {
   const [unlocked, setUnlocked] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [loggingIn, setLoggingIn] = useState(false);
@@ -21,6 +22,11 @@ export default function AdminPage() {
   const [loadingList, setLoadingList] = useState(false);
   const [listError, setListError] = useState("");
   const [search, setSearch] = useState("");
+  const [editingId, setEditingId] = useState<string | number | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [rowBusyId, setRowBusyId] = useState<string | number | null>(null);
+  const [dedupeRunning, setDedupeRunning] = useState(false);
 
   useEffect(() => {
     if (isAdminSession()) {
@@ -41,16 +47,33 @@ export default function AdminPage() {
         setUnlocked(false);
         return;
       }
-      const data = await res.json();
-      setContacts(data.contacts || []);
-    } catch {
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        setListError(errData.error || `Failed to load contacts (status ${res.status}).`);
+        setContacts([]);
+        return;
+      }
+      const data = await res.json().catch(() => null);
+      if (data && Array.isArray(data.contacts)) {
+        setContacts(data.contacts);
+      } else {
+        setListError("Unexpected response from server while loading contacts.");
+        setContacts([]);
+      }
+    } catch (err) {
+      console.error("loadContacts failed:", err);
       setListError("Failed to load registered contacts.");
+      setContacts([]);
     } finally {
       setLoadingList(false);
     }
   };
 
   const handleLogin = async () => {
+    if (!username.trim()) {
+      setLoginError("Enter the admin username.");
+      return;
+    }
     if (!password) {
       setLoginError("Enter the admin password.");
       return;
@@ -61,16 +84,17 @@ export default function AdminPage() {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username: username.trim(), password }),
       });
       const data = await res.json();
       if (data.success && data.token) {
         saveAdminToken(data.token);
         setUnlocked(true);
+        setUsername("");
         setPassword("");
         loadContacts();
       } else {
-        setLoginError(data.error || "Incorrect password.");
+        setLoginError(data.error || "Incorrect username or password.");
       }
     } catch {
       setLoginError("Network error. Try again.");
@@ -124,11 +148,92 @@ export default function AdminPage() {
         body: JSON.stringify({ query: search.trim() }),
       });
       const data = await res.json();
-      setContacts(Array.isArray(data) ? data : []);
+      if (Array.isArray(data)) {
+        setContacts(data);
+      } else {
+        setListError(data.error || "Search failed.");
+      }
     } catch {
       setListError("Search failed.");
     } finally {
       setLoadingList(false);
+    }
+  };
+
+  const startEdit = (c: Contact) => {
+    setEditingId(c.id ?? null);
+    setEditName(c.name || "");
+    setEditPhone(c.phone || "");
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditName("");
+    setEditPhone("");
+  };
+
+  const saveEdit = async (id: string | number) => {
+    setRowBusyId(id);
+    try {
+      const res = await adminFetch("/api/admin/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, name: editName.trim(), phone: editPhone.trim() }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setContacts((prev) =>
+          prev.map((c) => (c.id === id ? { ...c, name: editName.trim(), phone: editPhone.trim() } : c))
+        );
+        cancelEdit();
+      } else {
+        alert(data.error || "Failed to update contact.");
+      }
+    } catch {
+      alert("Network error while updating contact.");
+    } finally {
+      setRowBusyId(null);
+    }
+  };
+
+  const handleDelete = async (id: string | number) => {
+    if (!confirm("Delete this contact? This cannot be undone.")) return;
+    setRowBusyId(id);
+    try {
+      const res = await adminFetch("/api/admin/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setContacts((prev) => prev.filter((c) => c.id !== id));
+      } else {
+        alert(data.error || "Failed to delete contact.");
+      }
+    } catch {
+      alert("Network error while deleting contact.");
+    } finally {
+      setRowBusyId(null);
+    }
+  };
+
+  const handleDedupe = async () => {
+    if (!confirm("Remove all repeated phone numbers, keeping the earliest entry for each?")) return;
+    setDedupeRunning(true);
+    try {
+      const res = await adminFetch("/api/admin/dedupe", { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        alert(`Removed ${data.removed} duplicate contact(s).`);
+        loadContacts();
+      } else {
+        alert(data.error || "Failed to remove duplicates.");
+      }
+    } catch {
+      alert("Network error while removing duplicates.");
+    } finally {
+      setDedupeRunning(false);
     }
   };
 
@@ -155,13 +260,22 @@ export default function AdminPage() {
               Enter the admin password to unlock downloads and the registered list.
             </div>
             <input
+              type="text"
+              className="input-modern"
+              placeholder="Admin username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+              autoFocus
+              autoComplete="off"
+            />
+            <input
               type="password"
               className="input-modern"
               placeholder="Admin password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-              autoFocus
             />
             {loginError && <div className="error-text">{loginError}</div>}
             <button
@@ -240,6 +354,23 @@ export default function AdminPage() {
               <i className="fas fa-file-pdf" /> Download PDF
             </button>
           </div>
+          <div className="btn-group" style={{ marginTop: 10 }}>
+            <button
+              className="btn btn-ghost-purple btn-block"
+              onClick={handleDedupe}
+              disabled={dedupeRunning}
+            >
+              {dedupeRunning ? (
+                <>
+                  <span className="spinner" /> Removing duplicates...
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-broom" /> Remove Duplicate Numbers
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         <div className="card">
@@ -279,16 +410,88 @@ export default function AdminPage() {
                     <th>#</th>
                     <th>Name</th>
                     <th>Phone</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {contacts.map((c, i) => (
-                    <tr key={c.id || c.phone}>
-                      <td>{i + 1}</td>
-                      <td>{c.name || "—"}</td>
-                      <td>{c.phone}</td>
-                    </tr>
-                  ))}
+                  {contacts.map((c, i) => {
+                    const rowId = c.id ?? c.phone;
+                    const isEditing = editingId !== null && editingId === c.id;
+                    const isBusy = rowBusyId !== null && rowBusyId === c.id;
+                    return (
+                      <tr key={rowId}>
+                        <td>{i + 1}</td>
+                        {isEditing ? (
+                          <>
+                            <td>
+                              <input
+                                type="text"
+                                className="input-modern"
+                                style={{ marginBottom: 0, padding: "6px 10px" }}
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                              />
+                            </td>
+                            <td>
+                              <input
+                                type="text"
+                                className="input-modern"
+                                style={{ marginBottom: 0, padding: "6px 10px" }}
+                                value={editPhone}
+                                onChange={(e) => setEditPhone(e.target.value)}
+                              />
+                            </td>
+                            <td>
+                              <div style={{ display: "flex", gap: 6 }}>
+                                <button
+                                  className="btn btn-primary"
+                                  style={{ padding: "6px 10px", fontSize: "0.75rem" }}
+                                  onClick={() => c.id !== undefined && saveEdit(c.id)}
+                                  disabled={isBusy}
+                                >
+                                  {isBusy ? <span className="spinner" /> : <i className="fas fa-check" />}
+                                </button>
+                                <button
+                                  className="btn btn-secondary"
+                                  style={{ padding: "6px 10px", fontSize: "0.75rem" }}
+                                  onClick={cancelEdit}
+                                  disabled={isBusy}
+                                >
+                                  <i className="fas fa-xmark" />
+                                </button>
+                              </div>
+                            </td>
+                          </>
+                        ) : (
+                          <>
+                            <td>{c.name || "—"}</td>
+                            <td>{c.phone}</td>
+                            <td>
+                              <div style={{ display: "flex", gap: 6 }}>
+                                <button
+                                  className="btn btn-ghost-purple"
+                                  style={{ padding: "6px 10px", fontSize: "0.75rem" }}
+                                  onClick={() => startEdit(c)}
+                                  title="Edit"
+                                >
+                                  <i className="fas fa-pen" />
+                                </button>
+                                <button
+                                  className="btn btn-secondary"
+                                  style={{ padding: "6px 10px", fontSize: "0.75rem", borderColor: "#ff6b6b", color: "#ff6b6b" }}
+                                  onClick={() => c.id !== undefined && handleDelete(c.id)}
+                                  disabled={isBusy}
+                                  title="Delete"
+                                >
+                                  {isBusy ? <span className="spinner" /> : <i className="fas fa-trash" />}
+                                </button>
+                              </div>
+                            </td>
+                          </>
+                        )}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
