@@ -977,6 +977,10 @@ table.roster tr:hover td {
   animation: splash-spin 1.1s linear infinite;
 }
 
+.splash-spinner-stopped {
+  animation-play-state: paused;
+}
+
 @keyframes splash-spin {
   to { transform: rotate(360deg); }
 }
