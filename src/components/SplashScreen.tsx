@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const LOGO_DURATION_MS = 4000; // logo + spinner shown for 4s
+const LOGO_DURATION_MS = 3000; // logo + spinner shown for 3s
 const TYPE_TEXT = "Welcome to the website to increase vcf contact views";
 const TYPE_DURATION_MS = 5000; // full sentence types out over 5s
 
@@ -33,7 +33,7 @@ export default function SplashScreen({ onGetStarted }: Props) {
   return (
     <div className="splash-screen">
       <div className="splash-logo-wrap">
-        <div className="splash-spinner" />
+        <div className={`splash-spinner ${phase === "text" ? "splash-spinner-stopped" : ""}`} />
         <img src="/logo.png" alt="BMB VCF" className="splash-logo" />
       </div>
 
