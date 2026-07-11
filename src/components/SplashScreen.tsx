@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const LOGO_DURATION_MS = 10000; // logo + spinner shown for 10s
+const LOGO_DURATION_MS = 5000; // logo + spinner shown for 5s
 const TYPE_TEXT = "Welcome to the website to increase vcf contact views";
 const TYPE_DURATION_MS = 5000; // full sentence types out over 5s
 
