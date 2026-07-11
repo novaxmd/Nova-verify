@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import TopBar from "@/components/TopBar";
 import {
@@ -37,13 +37,17 @@ export default function AdminPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const loadRequestId = useRef(0);
+
   const loadContacts = async () => {
+    const requestId = ++loadRequestId.current;
     setLoadingList(true);
     setListError("");
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s safety timeout
     try {
       const res = await adminFetch("/api/admin/list", { signal: controller.signal });
+      if (requestId !== loadRequestId.current) return; // a newer request superseded this one
       if (res.status === 401) {
         clearAdminToken();
         setUnlocked(false);
@@ -63,6 +67,7 @@ export default function AdminPage() {
         setContacts([]);
       }
     } catch (err) {
+      if (requestId !== loadRequestId.current) return;
       console.error("loadContacts failed:", err);
       if (err instanceof Error && err.name === "AbortError") {
         setListError("Loading contacts timed out. Tap search (with empty box) to retry, or reload the page.");
@@ -72,7 +77,7 @@ export default function AdminPage() {
       setContacts([]);
     } finally {
       clearTimeout(timeoutId);
-      setLoadingList(false);
+      if (requestId === loadRequestId.current) setLoadingList(false);
     }
   };
 
