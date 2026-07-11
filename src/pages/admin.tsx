@@ -35,6 +35,24 @@ export default function AdminPage() {
   const requestId = useRef(0);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // In-app notifications (replaces browser alert()/confirm())
+  const [toast, setToast] = useState<{ message: string; kind: "success" | "error" } | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{
+    message: string;
+    onConfirm: () => void;
+  } | null>(null);
+
+  const showToast = (message: string, kind: "success" | "error" = "success") => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast({ message, kind });
+    toastTimer.current = setTimeout(() => setToast(null), 3200);
+  };
+
+  const askConfirm = (message: string, onConfirm: () => void) => {
+    setConfirmModal({ message, onConfirm });
+  };
+
   useEffect(() => {
     if (isAdminSession()) {
       setUnlocked(true);
@@ -176,7 +194,7 @@ export default function AdminPage() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({ error: "Download failed" }));
-        alert(data.error || "Download failed");
+        showToast(data.error || "Download failed", "error");
         return;
       }
       const blob = await res.blob();
@@ -189,7 +207,7 @@ export default function AdminPage() {
       document.body.removeChild(a);
       URL.revokeObjectURL(blobUrl);
     } catch {
-      alert("Download failed. Please try again.");
+      showToast("Download failed. Please try again.", "error");
     }
   };
 
@@ -218,56 +236,62 @@ export default function AdminPage() {
           prev.map((c) => (c.id === id ? { ...c, name: editName.trim(), phone: editPhone.trim() } : c))
         );
         setExpandedId(null);
+        showToast("Contact updated.", "success");
       } else {
-        alert(data.error || "Failed to update contact.");
+        showToast(data.error || "Failed to update contact.", "error");
       }
     } catch {
-      alert("Network error while updating contact.");
+      showToast("Network error while updating contact.", "error");
     } finally {
       setRowBusyId(null);
     }
   };
 
-  const handleDelete = async (id: string | number) => {
-    if (!confirm("Delete this contact? This cannot be undone.")) return;
-    setRowBusyId(id);
-    try {
-      const res = await adminFetch("/api/admin/delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setContacts((prev) => prev.filter((c) => c.id !== id));
-        setExpandedId(null);
-      } else {
-        alert(data.error || "Failed to delete contact.");
+  const handleDelete = (id: string | number) => {
+    askConfirm("Delete this contact? This cannot be undone.", async () => {
+      setConfirmModal(null);
+      setRowBusyId(id);
+      try {
+        const res = await adminFetch("/api/admin/delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setContacts((prev) => prev.filter((c) => c.id !== id));
+          setExpandedId(null);
+          showToast("Contact deleted.", "success");
+        } else {
+          showToast(data.error || "Failed to delete contact.", "error");
+        }
+      } catch {
+        showToast("Network error while deleting contact.", "error");
+      } finally {
+        setRowBusyId(null);
       }
-    } catch {
-      alert("Network error while deleting contact.");
-    } finally {
-      setRowBusyId(null);
-    }
+    });
   };
 
-  const handleDedupe = async () => {
-    if (!confirm("Remove all repeated phone numbers, keeping the earliest entry for each?")) return;
-    setDedupeRunning(true);
-    try {
-      const res = await adminFetch("/api/admin/dedupe", { method: "POST" });
-      const data = await res.json();
-      if (data.success) {
-        alert(`Removed ${data.removed} duplicate contact(s).`);
-        fetchContacts(search);
-      } else {
-        alert(data.error || "Failed to remove duplicates.");
+  const handleDedupe = () => {
+    askConfirm("Remove all repeated phone numbers, keeping the earliest entry for each?", async () => {
+      setConfirmModal(null);
+      setDedupeRunning(true);
+      try {
+        const res = await adminFetch("/api/admin/dedupe", { method: "POST" });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`Removed ${data.removed} duplicate contact(s).`, "success");
+          fetchContacts(search);
+        } else {
+          showToast(data.error || "Failed to remove duplicates.", "error");
+        }
+      } catch {
+        showToast("Network error while removing duplicates.", "error");
+      } finally {
+        setDedupeRunning(false);
       }
-    } catch {
-      alert("Network error while removing duplicates.");
-    } finally {
-      setDedupeRunning(false);
-    }
+    });
   };
 
   if (checkingSession) {
@@ -503,6 +527,39 @@ export default function AdminPage() {
             </div>
           )}
         </div>
+
+        {toast && (
+          <div className={`app-toast app-toast-${toast.kind}`}>
+            <i className={`fas ${toast.kind === "success" ? "fa-circle-check" : "fa-circle-exclamation"}`} />
+            <span>{toast.message}</span>
+          </div>
+        )}
+
+        {confirmModal && (
+          <div className="app-modal-overlay" onClick={() => setConfirmModal(null)}>
+            <div className="app-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="app-modal-icon">
+                <i className="fas fa-triangle-exclamation" />
+              </div>
+              <div className="app-modal-message">{confirmModal.message}</div>
+              <div className="btn-group">
+                <button
+                  className="btn btn-secondary btn-block"
+                  onClick={() => setConfirmModal(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn btn-primary btn-block"
+                  style={{ background: "#ff6b6b", borderColor: "#ff6b6b" }}
+                  onClick={() => confirmModal.onConfirm()}
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
