@@ -17,15 +17,20 @@ export default async function handler(
   }
 
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error, count } = await supabaseAdmin
       .from("contacts")
-      .select("id, name, phone, created_at")
+      .select("id, name, phone, created_at", { count: "exact" })
       .order("created_at", { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error("admin/list supabase error:", error);
+      throw error;
+    }
+
+    console.log(`admin/list: returning ${data?.length ?? 0} rows (count=${count})`);
     return res.status(200).json({ contacts: data || [] });
   } catch (err) {
-    console.error(err);
+    console.error("admin/list failed:", err);
     return res.status(500).json({ error: "Failed to fetch contacts" });
   }
 }
