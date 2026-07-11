@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Head from "next/head";
 import TopBar from "@/components/TopBar";
 import SplashScreen from "@/components/SplashScreen";
 import { countries } from "@/lib/countries";
-import type { Country } from "@/types";
 
 const TARGET = 500;
 
@@ -17,10 +16,8 @@ type ModalState = {
 export default function HomePage() {
   const [showSplash, setShowSplash] = useState(true);
   const [count, setCount] = useState<number>(0);
-  const [countrySearch, setCountrySearch] = useState("Tanzania");
-  const [selectedCode, setSelectedCode] = useState("+255");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [modal, setModal] = useState<ModalState>({
@@ -29,7 +26,6 @@ export default function HomePage() {
     message: "",
     isError: false,
   });
-  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchCount = async () => {
@@ -46,35 +42,51 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-        setDropdownOpen(false);
-      }
-    };
-    document.addEventListener("click", handler);
-    return () => document.removeEventListener("click", handler);
-  }, []);
+  // Sorted list of known country dial codes (longest first) so we can match
+  // "255...", "+255...", "1-242..." etc. against the correct country.
+  const sortedCodes = [...countries]
+    .map((c) => c.code.replace(/\D/g, "")) // digits only, e.g. "1242", "255"
+    .filter((code, idx, arr) => arr.indexOf(code) === idx)
+    .sort((a, b) => b.length - a.length);
 
-  const filteredCountries: Country[] = countries.filter((c) =>
-    c.name.toLowerCase().includes(countrySearch.toLowerCase())
-  );
+  const validatePhone = (value: string): string => {
+    const trimmed = value.trim();
+    if (!trimmed) return "Please enter your phone number";
+
+    const hasPlus = trimmed.startsWith("+");
+    const digitsOnly = trimmed.replace(/\D/g, "");
+
+    if (!hasPlus && !/^\d/.test(trimmed)) {
+      return "Start with your country code, e.g. +255 or 255";
+    }
+
+    const matchesKnownCode = sortedCodes.some((code) => digitsOnly.startsWith(code));
+    if (!matchesKnownCode) {
+      return "Start with your country code, e.g. +255 or 255";
+    }
+
+    return "";
+  };
 
   const percent = Math.min(100, (count / TARGET) * 100);
 
   const closeModal = () => setModal((m) => ({ ...m, open: false }));
 
   const handleSubmit = async () => {
-    if (!phone.trim()) {
-      setModal({ open: true, icon: "fa-triangle-exclamation", message: "Please enter your phone number", isError: true });
+    const validationError = validatePhone(phone);
+    if (validationError) {
+      setPhoneError(validationError);
+      setModal({ open: true, icon: "fa-triangle-exclamation", message: validationError, isError: true });
       return;
     }
+    setPhoneError("");
 
     setSubmitting(true);
     setModal({ open: true, icon: "fa-spinner fa-pulse", message: "Saving contact...", isError: false });
 
     try {
-      const fullPhone = `${selectedCode}${phone.replace(/\D/g, "")}`;
+      const digitsOnly = phone.trim().replace(/\D/g, "");
+      const fullPhone = `+${digitsOnly}`;
       const res = await fetch("/api/upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -146,49 +158,23 @@ export default function HomePage() {
           </div>
 
           <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
-            <div ref={wrapperRef} className="phone-row">
-              <div className="country-code-wrapper">
-                <input
-                  type="text"
-                  className="input-modern"
-                  placeholder="Country"
-                  value={countrySearch}
-                  onFocus={() => setDropdownOpen(true)}
-                  onChange={(e) => {
-                    setCountrySearch(e.target.value);
-                    setDropdownOpen(true);
-                  }}
-                  autoComplete="off"
-                />
-                {dropdownOpen && (
-                  <div className="country-dropdown">
-                    {filteredCountries.length === 0 && (
-                      <div style={{ color: "#8b7aa8" }}>No country found</div>
-                    )}
-                    {filteredCountries.map((c) => (
-                      <div
-                        key={c.name}
-                        onClick={() => {
-                          setSelectedCode(c.code);
-                          setCountrySearch(c.name);
-                          setDropdownOpen(false);
-                        }}
-                      >
-                        {c.name} ({c.code})
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <input
-                type="tel"
-                className="input-modern phone-number-input"
-                placeholder={`Phone number (${selectedCode})`}
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                autoComplete="off"
-              />
-            </div>
+            <input
+              type="tel"
+              className="input-modern"
+              placeholder="Phone number with country code (e.g. +255712345678)"
+              value={phone}
+              onChange={(e) => {
+                const value = e.target.value;
+                setPhone(value);
+                if (value.trim()) {
+                  setPhoneError(validatePhone(value));
+                } else {
+                  setPhoneError("");
+                }
+              }}
+              autoComplete="off"
+            />
+            {phoneError && <div className="error-text">{phoneError}</div>}
 
             <input
               type="text"
