@@ -40,8 +40,10 @@ export default function AdminPage() {
   const loadContacts = async () => {
     setLoadingList(true);
     setListError("");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s safety timeout
     try {
-      const res = await adminFetch("/api/admin/list");
+      const res = await adminFetch("/api/admin/list", { signal: controller.signal });
       if (res.status === 401) {
         clearAdminToken();
         setUnlocked(false);
@@ -62,9 +64,14 @@ export default function AdminPage() {
       }
     } catch (err) {
       console.error("loadContacts failed:", err);
-      setListError("Failed to load registered contacts.");
+      if (err instanceof Error && err.name === "AbortError") {
+        setListError("Loading contacts timed out. Tap search (with empty box) to retry, or reload the page.");
+      } else {
+        setListError("Failed to load registered contacts. Check your connection and try again.");
+      }
       setContacts([]);
     } finally {
+      clearTimeout(timeoutId);
       setLoadingList(false);
     }
   };
@@ -390,6 +397,19 @@ export default function AdminPage() {
             <button className="btn btn-secondary" onClick={handleSearch} style={{ flex: "0 0 auto" }}>
               <i className="fas fa-magnifying-glass" />
             </button>
+            {search.trim() !== "" && (
+              <button
+                className="btn btn-ghost-purple"
+                style={{ flex: "0 0 auto" }}
+                onClick={() => {
+                  setSearch("");
+                  loadContacts();
+                }}
+                title="Clear search and show all"
+              >
+                <i className="fas fa-xmark" />
+              </button>
+            )}
           </div>
 
           {listError && <div className="error-text">{listError}</div>}
