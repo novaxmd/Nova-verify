@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import TopBar from "@/components/TopBar";
+import SplashScreen from "@/components/SplashScreen";
 import { countries } from "@/lib/countries";
 import type { Country } from "@/types";
 
@@ -14,6 +15,7 @@ type ModalState = {
 };
 
 export default function HomePage() {
+  const [showSplash, setShowSplash] = useState(true);
   const [count, setCount] = useState<number>(0);
   const [countrySearch, setCountrySearch] = useState("Tanzania");
   const [selectedCode, setSelectedCode] = useState("+255");
@@ -101,6 +103,7 @@ export default function HomePage() {
       <Head>
         <title>BMB VCF · Command Center</title>
       </Head>
+      {showSplash && <SplashScreen onGetStarted={() => setShowSplash(false)} />}
       <div className="page">
         <TopBar title="BMB VCF" />
 
