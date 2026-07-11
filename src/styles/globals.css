@@ -819,3 +819,118 @@ table.roster tr:hover td {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* In-app notifications (replace native browser alert/confirm) */
+.app-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  background: #0d1a0d;
+  border: 1px solid var(--accent);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(57, 255, 20, 0.15);
+  color: var(--accent-pale);
+  font-size: 0.85rem;
+  z-index: 1000;
+  max-width: 90vw;
+  animation: toast-in 0.25s ease-out;
+}
+
+.app-toast-success {
+  border-color: var(--accent);
+}
+
+.app-toast-success i {
+  color: var(--accent);
+}
+
+.app-toast-error {
+  border-color: #ff6b6b;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(255, 107, 107, 0.15);
+}
+
+.app-toast-error i {
+  color: #ff6b6b;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.app-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  padding: 20px;
+  animation: overlay-in 0.15s ease-out;
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.app-modal {
+  width: 100%;
+  max-width: 340px;
+  background: #0d1a0d;
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 28px 22px 22px;
+  text-align: center;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(57, 255, 20, 0.1);
+  animation: modal-in 0.2s ease-out;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.app-modal-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #ff6b6b;
+}
+
+.app-modal-message {
+  color: var(--accent-pale);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.app-modal .btn-group {
+  gap: 10px;
+}
