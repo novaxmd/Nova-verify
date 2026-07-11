@@ -22,32 +22,52 @@ export default function AdminPage() {
   const [loadingList, setLoadingList] = useState(false);
   const [listError, setListError] = useState("");
   const [search, setSearch] = useState("");
-  const [editingId, setEditingId] = useState<string | number | null>(null);
+
+  // Which row is expanded to show edit/delete actions
+  const [expandedId, setExpandedId] = useState<string | number | null>(null);
   const [editName, setEditName] = useState("");
   const [editPhone, setEditPhone] = useState("");
   const [rowBusyId, setRowBusyId] = useState<string | number | null>(null);
   const [dedupeRunning, setDedupeRunning] = useState(false);
 
+  // Guards against stale/overlapping requests (list or search) leaving the
+  // UI stuck on "Loading..." or showing outdated results.
+  const requestId = useRef(0);
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     if (isAdminSession()) {
       setUnlocked(true);
-      loadContacts();
+      fetchContacts("");
     }
     setCheckingSession(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const loadRequestId = useRef(0);
-
-  const loadContacts = async () => {
-    const requestId = ++loadRequestId.current;
+  // Unified loader: empty query -> full list, otherwise -> search.
+  // Every call gets an id; only the latest one is allowed to update state,
+  // so a slow earlier request can never overwrite a newer result or leave
+  // loadingList stuck at true.
+  const fetchContacts = async (query: string) => {
+    const myId = ++requestId.current;
     setLoadingList(true);
     setListError("");
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s safety timeout
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
     try {
-      const res = await adminFetch("/api/admin/list", { signal: controller.signal });
-      if (requestId !== loadRequestId.current) return; // a newer request superseded this one
+      const trimmed = query.trim();
+      const res = trimmed
+        ? await adminFetch("/api/admin/search", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query: trimmed }),
+            signal: controller.signal,
+          })
+        : await adminFetch("/api/admin/list", { signal: controller.signal });
+
+      if (myId !== requestId.current) return; // superseded by a newer request
+
       if (res.status === 401) {
         clearAdminToken();
         setUnlocked(false);
@@ -60,25 +80,51 @@ export default function AdminPage() {
         return;
       }
       const data = await res.json().catch(() => null);
-      if (data && Array.isArray(data.contacts)) {
-        setContacts(data.contacts);
+      if (trimmed) {
+        // /api/admin/search returns a bare array
+        if (Array.isArray(data)) {
+          setContacts(data);
+        } else {
+          setListError((data && data.error) || "Search failed.");
+          setContacts([]);
+        }
       } else {
-        setListError("Unexpected response from server while loading contacts.");
-        setContacts([]);
+        // /api/admin/list returns { contacts: [...] }
+        if (data && Array.isArray(data.contacts)) {
+          setContacts(data.contacts);
+        } else {
+          setListError("Unexpected response from server while loading contacts.");
+          setContacts([]);
+        }
       }
     } catch (err) {
-      if (requestId !== loadRequestId.current) return;
-      console.error("loadContacts failed:", err);
+      if (myId !== requestId.current) return;
+      console.error("fetchContacts failed:", err);
       if (err instanceof Error && err.name === "AbortError") {
-        setListError("Loading contacts timed out. Tap search (with empty box) to retry, or reload the page.");
+        setListError("Loading timed out. Check your connection and try again.");
       } else {
-        setListError("Failed to load registered contacts. Check your connection and try again.");
+        setListError("Failed to load contacts. Check your connection and try again.");
       }
       setContacts([]);
     } finally {
       clearTimeout(timeoutId);
-      if (requestId === loadRequestId.current) setLoadingList(false);
+      if (myId === requestId.current) setLoadingList(false);
     }
+  };
+
+  // Debounced search-as-you-type (400ms after the user stops typing)
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      fetchContacts(value);
+    }, 400);
+  };
+
+  const clearSearch = () => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    setSearch("");
+    fetchContacts("");
   };
 
   const handleLogin = async () => {
@@ -104,7 +150,7 @@ export default function AdminPage() {
         setUnlocked(true);
         setUsername("");
         setPassword("");
-        loadContacts();
+        fetchContacts("");
       } else {
         setLoginError(data.error || "Incorrect username or password.");
       }
@@ -147,41 +193,15 @@ export default function AdminPage() {
     }
   };
 
-  const handleSearch = async () => {
-    if (!search.trim()) {
-      loadContacts();
+  const toggleExpand = (c: Contact) => {
+    const rowId = c.id ?? c.phone;
+    if (expandedId === rowId) {
+      setExpandedId(null);
       return;
     }
-    setLoadingList(true);
-    try {
-      const res = await adminFetch("/api/admin/search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: search.trim() }),
-      });
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setContacts(data);
-      } else {
-        setListError(data.error || "Search failed.");
-      }
-    } catch {
-      setListError("Search failed.");
-    } finally {
-      setLoadingList(false);
-    }
-  };
-
-  const startEdit = (c: Contact) => {
-    setEditingId(c.id ?? null);
+    setExpandedId(rowId);
     setEditName(c.name || "");
     setEditPhone(c.phone || "");
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditName("");
-    setEditPhone("");
   };
 
   const saveEdit = async (id: string | number) => {
@@ -197,7 +217,7 @@ export default function AdminPage() {
         setContacts((prev) =>
           prev.map((c) => (c.id === id ? { ...c, name: editName.trim(), phone: editPhone.trim() } : c))
         );
-        cancelEdit();
+        setExpandedId(null);
       } else {
         alert(data.error || "Failed to update contact.");
       }
@@ -220,6 +240,7 @@ export default function AdminPage() {
       const data = await res.json();
       if (data.success) {
         setContacts((prev) => prev.filter((c) => c.id !== id));
+        setExpandedId(null);
       } else {
         alert(data.error || "Failed to delete contact.");
       }
@@ -238,7 +259,7 @@ export default function AdminPage() {
       const data = await res.json();
       if (data.success) {
         alert(`Removed ${data.removed} duplicate contact(s).`);
-        loadContacts();
+        fetchContacts(search);
       } else {
         alert(data.error || "Failed to remove duplicates.");
       }
@@ -396,20 +417,13 @@ export default function AdminPage() {
               style={{ marginBottom: 0 }}
               placeholder="Search by name or phone..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              onChange={(e) => handleSearchChange(e.target.value)}
             />
-            <button className="btn btn-secondary" onClick={handleSearch} style={{ flex: "0 0 auto" }}>
-              <i className="fas fa-magnifying-glass" />
-            </button>
             {search.trim() !== "" && (
               <button
                 className="btn btn-ghost-purple"
                 style={{ flex: "0 0 auto" }}
-                onClick={() => {
-                  setSearch("");
-                  loadContacts();
-                }}
+                onClick={clearSearch}
                 title="Clear search and show all"
               >
                 <i className="fas fa-xmark" />
@@ -428,97 +442,64 @@ export default function AdminPage() {
               No contacts found.
             </div>
           ) : (
-            <div className="table-wrap">
-              <table className="roster">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {contacts.map((c, i) => {
-                    const rowId = c.id ?? c.phone;
-                    const isEditing = editingId !== null && editingId === c.id;
-                    const isBusy = rowBusyId !== null && rowBusyId === c.id;
-                    return (
-                      <tr key={rowId}>
-                        <td>{i + 1}</td>
-                        {isEditing ? (
-                          <>
-                            <td>
-                              <input
-                                type="text"
-                                className="input-modern"
-                                style={{ marginBottom: 0, padding: "6px 10px" }}
-                                value={editName}
-                                onChange={(e) => setEditName(e.target.value)}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                type="text"
-                                className="input-modern"
-                                style={{ marginBottom: 0, padding: "6px 10px" }}
-                                value={editPhone}
-                                onChange={(e) => setEditPhone(e.target.value)}
-                              />
-                            </td>
-                            <td>
-                              <div style={{ display: "flex", gap: 6 }}>
-                                <button
-                                  className="btn btn-primary"
-                                  style={{ padding: "6px 10px", fontSize: "0.75rem" }}
-                                  onClick={() => c.id !== undefined && saveEdit(c.id)}
-                                  disabled={isBusy}
-                                >
-                                  {isBusy ? <span className="spinner" /> : <i className="fas fa-check" />}
-                                </button>
-                                <button
-                                  className="btn btn-secondary"
-                                  style={{ padding: "6px 10px", fontSize: "0.75rem" }}
-                                  onClick={cancelEdit}
-                                  disabled={isBusy}
-                                >
-                                  <i className="fas fa-xmark" />
-                                </button>
-                              </div>
-                            </td>
-                          </>
-                        ) : (
-                          <>
-                            <td>{c.name || "—"}</td>
-                            <td>{c.phone}</td>
-                            <td>
-                              <div style={{ display: "flex", gap: 6 }}>
-                                <button
-                                  className="btn btn-ghost-purple"
-                                  style={{ padding: "6px 10px", fontSize: "0.75rem" }}
-                                  onClick={() => startEdit(c)}
-                                  title="Edit"
-                                >
-                                  <i className="fas fa-pen" />
-                                </button>
-                                <button
-                                  className="btn btn-secondary"
-                                  style={{ padding: "6px 10px", fontSize: "0.75rem", borderColor: "#ff6b6b", color: "#ff6b6b" }}
-                                  onClick={() => c.id !== undefined && handleDelete(c.id)}
-                                  disabled={isBusy}
-                                  title="Delete"
-                                >
-                                  {isBusy ? <span className="spinner" /> : <i className="fas fa-trash" />}
-                                </button>
-                              </div>
-                            </td>
-                          </>
-                        )}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+            <div className="roster-list">
+              {contacts.map((c, i) => {
+                const rowId = c.id ?? c.phone;
+                const isExpanded = expandedId === rowId;
+                const isBusy = rowBusyId !== null && rowBusyId === c.id;
+                return (
+                  <div className="roster-item" key={rowId}>
+                    <button
+                      type="button"
+                      className="roster-row"
+                      onClick={() => toggleExpand(c)}
+                    >
+                      <span className="roster-index">{i + 1}</span>
+                      <span className="roster-info">
+                        <span className="roster-name">{c.name || "—"}</span>
+                        <span className="roster-phone">{c.phone}</span>
+                      </span>
+                      <i className={`fas fa-chevron-${isExpanded ? "up" : "down"}`} />
+                    </button>
+
+                    {isExpanded && (
+                      <div className="roster-details">
+                        <input
+                          type="text"
+                          className="input-modern"
+                          placeholder="Name"
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                        />
+                        <input
+                          type="text"
+                          className="input-modern"
+                          placeholder="Phone"
+                          value={editPhone}
+                          onChange={(e) => setEditPhone(e.target.value)}
+                        />
+                        <div className="btn-group">
+                          <button
+                            className="btn btn-primary"
+                            onClick={() => c.id !== undefined && saveEdit(c.id)}
+                            disabled={isBusy}
+                          >
+                            {isBusy ? <span className="spinner" /> : <i className="fas fa-check" />} Save
+                          </button>
+                          <button
+                            className="btn btn-secondary"
+                            style={{ borderColor: "#ff6b6b", color: "#ff6b6b" }}
+                            onClick={() => c.id !== undefined && handleDelete(c.id)}
+                            disabled={isBusy}
+                          >
+                            {isBusy ? <span className="spinner" /> : <i className="fas fa-trash" />} Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
