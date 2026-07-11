@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Editor - BMB VCF</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0612;
+      background-image: radial-gradient(circle at 25% 0%, #2d1b4e 0%, #0a0612 50%);
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      padding: 2rem;
+      color: white;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(8, 18, 8, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 32px;
+      padding: 2rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(168, 85, 247,0.1) inset;
+    }
+
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, #ffffff, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .search-section {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 2rem;
+    }
+
+    .search-input {
+      flex: 1;
+      background: rgba(0,0,0,0.6);
+      border: 1.5px solid rgba(168, 85, 247, 0.3);
+      border-radius: 16px;
+      padding: 1rem 1.5rem;
+      font-size: 1rem;
+      color: white;
+      outline: none;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .search-input:focus {
+      border-color: #a855f7;
+      box-shadow: 0 0 0 3px rgba(168, 85, 247,0.2);
+    }
+
+    .btn-primary {
+      background: #a855f7;
+      border: none;
+      border-radius: 16px;
+      padding: 0 2rem;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #0a0612;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 4px 0 #6b21a8;
+    }
+
+    .btn-primary:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #6b21a8;
+    }
+
+    .results-card {
+      background: rgba(0,0,0,0.4);
+      border-radius: 24px;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+
+    .contact-item {
+      background: rgba(168, 85, 247,0.05);
+      border: 1px solid rgba(168, 85, 247,0.2);
+      border-radius: 20px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: 0.2s;
+    }
+
+    .contact-item:hover {
+      border-color: #a855f7;
+      background: rgba(168, 85, 247,0.1);
+    }
+
+    .contact-info {
+      flex: 1;
+    }
+
+    .contact-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+
+    .contact-phone {
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: #c084fc;
+    }
+
+    .edit-btn {
+      background: #ffaa33;
+      border: none;
+      border-radius: 14px;
+      padding: 8px 20px;
+      font-weight: bold;
+      color: #0a0612;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+
+    .edit-btn:hover {
+      background: #ffcc55;
+      transform: scale(1.02);
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #150a24;
+      border: 1px solid #a855f7;
+      border-radius: 32px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 0 40px rgba(168, 85, 247,0.3);
+    }
+
+    .modal-content h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.6rem;
+      margin-bottom: 1.5rem;
+      color: #a855f7;
+    }
+
+    .modal-content input, .country-selector {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .country-selector {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .country-code-btn {
+      background: #1e1330;
+      border: 1.5px solid rgba(168, 85, 247,0.4);
+      border-radius: 16px;
+      padding: 0.8rem 1rem;
+      color: #a855f7;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      width: 130px;
+      position: relative;
+    }
+
+    .country-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #150a24;
+      border: 1px solid #a855f7;
+      border-radius: 20px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1100;
+    }
+
+    .country-dropdown div {
+      padding: 8px 12px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .country-dropdown div:hover {
+      background: #a855f7;
+      color: #0a0612;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 1.5rem;
+    }
+
+    .modal-buttons button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .save-modal {
+      background: #a855f7;
+      color: #0a0612;
+      border: none;
+    }
+
+    .cancel-modal {
+      background: transparent;
+      border: 1.5px solid #a855f7;
+      color: white;
+    }
+
+    .message {
+      margin-top: 1rem;
+      padding: 12px;
+      border-radius: 16px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .message.success {
+      background: rgba(168, 85, 247,0.2);
+      color: #a855f7;
+    }
+
+    .message.error {
+      background: rgba(255,0,0,0.2);
+      color: #ff8888;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #8b7aa8;
+    }
+
+    hr {
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #a855f7, transparent);
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1><i class="fas fa-edit"></i> Edit Contacts</h1>
+
+  <div class="search-section">
+    <input type="text" id="searchQuery" class="search-input" placeholder="🔎 Search by name or phone number...">
+    <button class="btn-primary" onclick="searchContacts()"><i class="fas fa-search"></i> Search</button>
+  </div>
+
+  <div id="resultsContainer" class="results-card">
+    <!-- Results will appear here -->
+    <div style="text-align: center; color: #8b7aa8;">Type a name or number and click Search</div>
+  </div>
+
+  <div id="message" class="message"></div>
+  <hr>
+  <div class="footer">BMB TECH · Secure Contact Editor</div>
+</div>
+
+<!-- Modal for editing -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <h3>✏️ Edit Contact</h3>
+    <input type="text" id="editName" class="search-input" placeholder="Full name" style="margin-bottom: 1rem;">
+    
+    <div class="country-selector">
+      <div style="position: relative; width: 130px;">
+        <div id="modalCountryBtn" class="country-code-btn">+255 ▼</div>
+        <div id="modalCountryDropdown" class="country-dropdown"></div>
+      </div>
+      <input type="tel" id="editPhoneLocal" class="search-input" placeholder="Phone number (without code)" style="flex:1; margin-bottom: 0;">
+    </div>
+    
+    <div class="modal-buttons">
+      <button class="save-modal" onclick="saveEditedContact()"><i class="fas fa-save"></i> Save</button>
+      <button class="cancel-modal" onclick="closeModal()"><i class="fas fa-times"></i> Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="lib/Country.js"></script>
+<script>
+  let currentEditId = null;
+  let selectedCountryCode = "+255";
+
+  // Initialize country dropdown for modal
+  const modalBtn = document.getElementById('modalCountryBtn');
+  const modalDropdown = document.getElementById('modalCountryDropdown');
+
+  function renderModalDropdown(filter = "") {
+    const filtered = window.countriesList.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
+    if (filtered.length === 0) {
+      modalDropdown.innerHTML = "<div style='color:#aaa;'>No country found</div>";
+    } else {
+      modalDropdown.innerHTML = filtered.map(c => `<div data-code="${c.code}" data-name="${c.name}">${c.name} (${c.code})</div>`).join('');
+    }
+    modalDropdown.style.display = "block";
+    document.querySelectorAll('#modalCountryDropdown div').forEach(div => {
+      div.addEventListener('click', () => {
+        const code = div.getAttribute('data-code');
+        selectedCountryCode = code;
+        modalBtn.innerHTML = `${code} ▼`;
+        modalDropdown.style.display = "none";
+      });
+    });
+  }
+
+  modalBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    renderModalDropdown("");
+  });
+  document.addEventListener('click', function(e) {
+    if (!modalBtn.contains(e.target) && !modalDropdown.contains(e.target)) {
+      modalDropdown.style.display = "none";
+    }
+  });
+
+  // Search contacts
+  async function searchContacts() {
+    const query = document.getElementById('searchQuery').value.trim();
+    if (!query) {
+      showMessage("Please enter a name or phone number", "error");
+      return;
+    }
+    try {
+      const res = await fetch('/api/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+      });
+      const data = await res.json();
+      if (!Array.isArray(data)) throw new Error("Invalid response");
+      displayResults(data);
+    } catch (err) {
+      showMessage("Search failed: " + err.message, "error");
+    }
+  }
+
+  function displayResults(contacts) {
+    const container = document.getElementById('resultsContainer');
+    if (contacts.length === 0) {
+      container.innerHTML = "<div style='text-align: center; color: #8b7aa8;'>🙅 No contacts found</div>";
+      return;
+    }
+    let html = "";
+    contacts.forEach(contact => {
+      html += `
+        <div class="contact-item">
+          <div class="contact-info">
+            <div class="contact-name">${escapeHtml(contact.name) || "No name"}</div>
+            <div class="contact-phone">${escapeHtml(contact.phone)}</div>
+          </div>
+          <button class="edit-btn" onclick="openEditModal(${contact.id}, '${escapeHtml(contact.name)}', '${escapeHtml(contact.phone)}')">
+            <i class="fas fa-pen"></i> Edit
+          </button>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  function openEditModal(id, currentName, currentPhone) {
+    currentEditId = id;
+    document.getElementById('editName').value = currentName || "";
+    
+    // Parse current phone to extract country code and local number (best effort)
+    let localNumber = currentPhone;
+    let detectedCode = "+255";
+    // Try to find matching country code from our list
+    for (let country of window.countriesList) {
+      if (currentPhone.startsWith(country.code)) {
+        detectedCode = country.code;
+        localNumber = currentPhone.substring(country.code.length);
+        break;
+      }
+    }
+    selectedCountryCode = detectedCode;
+    modalBtn.innerHTML = `${selectedCountryCode} ▼`;
+    document.getElementById('editPhoneLocal').value = localNumber;
+    
+    document.getElementById('editModal').classList.add('active');
+  }
+
+  async function saveEditedContact() {
+    const newName = document.getElementById('editName').value.trim();
+    let localNumber = document.getElementById('editPhoneLocal').value.trim();
+    if (!localNumber) {
+      showMessage("Phone number cannot be empty", "error");
+      return;
+    }
+    const digitsOnly = localNumber.replace(/\D/g, '');
+    if (digitsOnly.length === 0) {
+      showMessage("Invalid phone number", "error");
+      return;
+    }
+    const fullPhone = selectedCountryCode + digitsOnly;
+    
+    try {
+      const res = await fetch('/api/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: currentEditId, name: newName || null, phone: fullPhone })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMessage("✅ Contact updated successfully!", "success");
+        closeModal();
+        searchContacts(); // refresh list
+      } else {
+        throw new Error(data.error || "Update failed");
+      }
+    } catch (err) {
+      showMessage("Error: " + err.message, "error");
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('editModal').classList.remove('active');
+    currentEditId = null;
+  }
+
+  function showMessage(text, type) {
+    const msgDiv = document.getElementById('message');
+    msgDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+    setTimeout(() => { msgDiv.innerHTML = ""; }, 3000);
+  }
+
+  function escapeHtml(str) {
+    if (!str) return "";
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  // Close modal when clicking outside content
+  window.onclick = function(event) {
+    const modal = document.getElementById('editModal');
+    if (event.target === modal) closeModal();
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "Bmb-vcf",
+  "version": "1.0.0",
+  "description": "VCF contact uploader",
+  "main": "index.js",
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.43.0"
+  }
+}
