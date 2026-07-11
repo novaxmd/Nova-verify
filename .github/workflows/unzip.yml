@@ -15,12 +15,6 @@ jobs:
       - name: Install Unzip
         run: sudo apt-get install -y unzip
 
-      - name: Delete Old Files Before Extraction
-        run: |
-          # Delete all files and folders except .git and .github
-          find . -maxdepth 1 -not -name '.git' -not -name '.github' -not -name 'project.zip' -delete
-          echo "Old files deleted successfully"
-
       - name: Extract Project Files
         run: |
           # 1. Create a temporary folder and unzip there
