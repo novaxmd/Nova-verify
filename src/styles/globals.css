@@ -643,6 +643,80 @@ table.roster tr:hover td {
   background: rgba(57, 255, 20, 0.05);
 }
 
+/* Admin: expandable registered-user list (row-tap accordion) */
+.roster-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.roster-item {
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(57, 255, 20, 0.02);
+}
+
+.roster-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.roster-row:hover {
+  background: rgba(57, 255, 20, 0.05);
+}
+
+.roster-index {
+  color: var(--accent-light);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  min-width: 20px;
+}
+
+.roster-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.roster-name {
+  color: var(--accent-pale);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.roster-phone {
+  color: var(--accent-light);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+}
+
+.roster-details {
+  padding: 12px 14px 14px;
+  border-top: 1px solid rgba(57, 255, 20, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(57, 255, 20, 0.03);
+}
+
+.roster-details .btn-group {
+  margin-top: 0;
+}
+
 /* Admin unlock modal / panel */
 .admin-lock-panel {
   max-width: 380px;
