@@ -49,7 +49,9 @@ export default function HomePage() {
     .filter((code, idx, arr) => arr.indexOf(code) === idx)
     .sort((a, b) => b.length - a.length);
 
-  const validatePhone = (value: string): string => {
+  const MIN_LOCAL_DIGITS = 7; // minimum digits expected after the country code
+
+  const validatePhone = (value: string, strict = false): string => {
     const trimmed = value.trim();
     if (!trimmed) return "Please enter your phone number";
 
@@ -63,11 +65,16 @@ export default function HomePage() {
     // Wait until at least 3 digits are typed before flagging an unknown
     // code — this gives the user room to finish typing their country code
     // (e.g. "+2", "+25" are incomplete, not wrong) before we judge it.
-    if (digitsOnly.length < 3) return "";
+    if (!strict && digitsOnly.length < 3) return "";
 
-    const matchesKnownCode = sortedCodes.some((code) => digitsOnly.startsWith(code));
-    if (!matchesKnownCode) {
+    const matchedCode = sortedCodes.find((code) => digitsOnly.startsWith(code));
+    if (!matchedCode) {
       return "Start with your country code, e.g. +255 or 255";
+    }
+
+    const localDigits = digitsOnly.slice(matchedCode.length);
+    if (strict && localDigits.length < MIN_LOCAL_DIGITS) {
+      return "Phone number looks incomplete. Please enter the full number.";
     }
 
     return "";
@@ -78,16 +85,7 @@ export default function HomePage() {
   const closeModal = () => setModal((m) => ({ ...m, open: false }));
 
   const handleSubmit = async () => {
-    const digitsOnly = phone.trim().replace(/\D/g, "");
-    if (digitsOnly.length < 8) {
-      const msg = digitsOnly.length === 0
-        ? "Please enter your phone number"
-        : "Start with your country code, e.g. +255 or 255";
-      setPhoneError(msg);
-      setModal({ open: true, icon: "fa-triangle-exclamation", message: msg, isError: true });
-      return;
-    }
-    const validationError = validatePhone(phone);
+    const validationError = validatePhone(phone, true);
     if (validationError) {
       setPhoneError(validationError);
       setModal({ open: true, icon: "fa-triangle-exclamation", message: validationError, isError: true });
