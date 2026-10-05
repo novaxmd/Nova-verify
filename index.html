@@ -1,0 +1,3476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="theme-color" content="#0a0a0f"/>
+  <title>AHMAD-MD | Mini BOT</title>
+
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </noscript>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <style>
+    :root {
+      --brand-1: #00c853;
+      --brand-2: #00e676;
+      --brand-3: #00d4aa;
+      --brand-glow: 0, 200, 83;
+      --bg-body: #0a0a0f;
+      --bg-card: rgba(20,20,30,.7);
+      --bg-card-mobile: rgba(20,20,30,.95);
+      --text-main: #fff;
+      --text-sub: rgba(255,255,255,.6);
+      --text-muted: rgba(255,255,255,.4);
+      --border-soft: rgba(255,255,255,.1);
+      --border-softer: rgba(255,255,255,.15);
+      --input-bg: rgba(255,255,255,.05);
+      --input-bg-focus: rgba(255,255,255,.08);
+      --server-bg: rgba(15,15,25,.9);
+      --server-option-bg: rgba(255,255,255,.05);
+      --code-box-bg: rgba(0,0,0,.4);
+      --dropdown-bg: rgba(20,20,30,.98);
+      --toast-text: #fff;
+      --orb-opacity: .3;
+    }
+
+    body.light-mode {
+      --bg-body: #f0f2f8;
+      --bg-card: rgba(255,255,255,.85);
+      --bg-card-mobile: rgba(255,255,255,.98);
+      --text-main: #1a1a2e;
+      --text-sub: rgba(26,26,46,.65);
+      --text-muted: rgba(26,26,46,.45);
+      --border-soft: rgba(0,0,0,.08);
+      --border-softer: rgba(0,0,0,.12);
+      --input-bg: rgba(0,0,0,.03);
+      --input-bg-focus: rgba(0,0,0,.06);
+      --server-bg: rgba(255,255,255,.98);
+      --server-option-bg: rgba(0,0,0,.03);
+      --code-box-bg: rgba(0,0,0,.04);
+      --dropdown-bg: rgba(255,255,255,.98);
+      --orb-opacity: .12;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:'Poppins',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      background:var(--bg-body);color:var(--text-main);min-height:100vh;position:relative;overflow-x:hidden;
+      -webkit-font-smoothing:antialiased;text-rendering:optimizeSpeed;
+      transition: background .4s ease, color .4s ease;
+    }
+    .bg-gradient{
+      position:fixed;width:100%;height:100%;
+      background:radial-gradient(circle at 30% 40%,rgba(102,126,234,.15) 0%,transparent 60%),
+                 radial-gradient(circle at 70% 70%,rgba(118,75,162,.15) 0%,transparent 60%),
+                 var(--bg-body);
+      z-index:0;transition:background .4s ease
+    }
+    .glow-orb{
+      position:fixed;width:600px;height:600px;border-radius:50%;
+      filter:blur(120px);opacity:var(--orb-opacity);z-index:1;animation:float 20s infinite ease-in-out;
+      will-change:transform;pointer-events:none;
+      background:linear-gradient(135deg, var(--brand-1), var(--brand-2));
+      transition:background .4s ease, opacity .4s ease
+    }
+    .orb-1{top:-200px;left:-200px;animation-delay:0s}
+    .orb-2{bottom:-200px;right:-200px;background:linear-gradient(135deg, var(--brand-2), var(--brand-1));animation-delay:-10s}
+    @keyframes float{
+      0%,100%{transform:translate(0,0) scale(1)}
+      33%{transform:translate(50px,-50px) scale(1.1)}
+      66%{transform:translate(-50px,50px) scale(.9)}
+    }
+
+    .particles-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 4px; height: 4px;
+      background: var(--brand-2);
+      border-radius: 50%;
+      opacity: 0.4;
+      box-shadow: 0 0 8px var(--brand-2);
+      animation: particleFloat linear infinite;
+    }
+    @keyframes particleFloat {
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.5; }
+      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+
+    .container{position:relative;z-index:10;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .card{
+      width:100%;max-width:480px;background:var(--bg-card);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      border:1px solid var(--border-soft);border-radius:30px;padding:40px 30px;
+      box-shadow:0 20px 80px rgba(0,0,0,.3);position:relative;overflow:hidden;
+      animation:slideIn .5s ease-out;contain:layout style;
+      transition: background .4s ease, border-color .4s ease;
+    }
+    @keyframes slideIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+    .card::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,transparent,var(--brand-1),var(--brand-2),transparent);
+      transition:background .4s ease
+    }
+    .header{text-align:center;margin-bottom:30px;position:relative}
+
+    .top-controls{
+      position:absolute;top:0;right:0;
+      display:flex;flex-direction:column;align-items:flex-end;gap:6px;z-index:20
+    }
+
+    .dropdown-btn{
+      background:var(--input-bg);
+      border:1px solid var(--border-softer);
+      border-radius:40px;padding:6px 12px;
+      display:flex;align-items:center;gap:6px;cursor:pointer;
+      color:var(--text-main);font-size:11px;font-weight:600;font-family:inherit;
+      transition:background .2s ease,transform .2s ease,color .4s ease,border-color .4s ease
+    }
+    .dropdown-btn:hover{background:var(--input-bg-focus);transform:translateY(-1px)}
+    .dropdown-btn svg{width:14px;height:14px;fill:currentColor;opacity:.9;flex-shrink:0}
+    .dropdown-btn .dot{
+      width:10px;height:10px;border-radius:50%;
+      background:linear-gradient(135deg,var(--brand-1),var(--brand-2));
+      box-shadow:0 0 6px rgba(var(--brand-glow),.6);
+      flex-shrink:0
+    }
+    .dropdown-btn .arrow{font-size:9px;opacity:.6;transition:transform .3s ease}
+    .dropdown-btn.open .arrow{transform:rotate(180deg)}
+
+    .quick-actions {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      max-width: 220px;
+    }
+    .icon-btn {
+      background:var(--input-bg);
+      border:1px solid var(--border-softer);
+      border-radius:50%;
+      width:32px;height:32px;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;color:var(--text-main);font-size:13px;
+      transition:background .2s ease,transform .2s ease,color .3s ease;
+      font-family:inherit;
+      position:relative;
+    }
+    .icon-btn:hover{background:var(--input-bg-focus);transform:translateY(-2px)}
+    .icon-btn.active { color: var(--brand-2); }
+    .icon-btn .badge-dot {
+      position:absolute;top:-2px;right:-2px;
+      width:8px;height:8px;border-radius:50%;
+      background:var(--brand-2);border:1.5px solid var(--bg-card);
+      display:none;
+    }
+    .icon-btn .badge-dot.show { display: block; }
+    .icon-btn .ref-badge {
+      position: absolute;
+      top: -4px; left: -4px;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+      color: #fff; font-size: 9px;
+      font-weight: 700;
+      padding: 1px 5px; border-radius: 10px;
+      min-width: 16px; text-align: center;
+      border: 1.5px solid var(--bg-card);
+      box-shadow: 0 0 6px rgba(var(--brand-glow),.6);
+      display: none;
+    }
+
+    .dropdown-menu{
+      background:var(--dropdown-bg);
+      border:1px solid var(--border-softer);
+      border-radius:14px;padding:8px;
+      display:none;
+      flex-direction:column;gap:2px;
+      box-shadow:0 15px 40px rgba(0,0,0,.4);
+      position:absolute;top:calc(100% + 6px);right:0;
+      min-width:260px;max-height:400px;overflow-y:auto;
+      z-index:50;
+      animation:fadeIn .25s ease-out;
+      -webkit-overflow-scrolling:touch
+    }
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+    .dropdown-menu.show{display:flex}
+
+    .lang-option{
+      display:flex;align-items:center;gap:10px;
+      padding:9px 12px;border-radius:10px;cursor:pointer;
+      color:var(--text-sub);font-size:13px;font-weight:500;
+      transition:background .15s ease,color .3s ease;white-space:nowrap;
+      border:none;background:transparent;width:100%;text-align:left;
+      font-family:inherit
+    }
+    .lang-option:hover{background:var(--input-bg)}
+    .lang-option.active{background:rgba(var(--brand-glow),.15);color:var(--text-main);font-weight:600}
+    .lang-option.active::after{
+      content:'✓';margin-left:auto;color:var(--brand-2);
+      font-weight:700;font-size:14px
+    }
+    .lang-option .flag{font-size:16px;line-height:1}
+
+    .dropdown-menu.themes{
+      display:none;flex-direction:column;gap:2px;
+      min-width:260px;max-height:440px
+    }
+    .dropdown-menu.themes.show{display:flex}
+
+    .theme-option{
+      display:flex;align-items:center;gap:10px;
+      padding:8px 10px;border-radius:10px;cursor:pointer;
+      color:var(--text-sub);font-size:12px;font-weight:500;
+      transition:background .15s ease,color .3s ease;white-space:nowrap;
+      border:none;background:transparent;width:100%;text-align:left;font-family:inherit
+    }
+    .theme-option:hover{background:var(--input-bg)}
+    .theme-option.active{background:rgba(var(--brand-glow),.15);color:var(--text-main);font-weight:600}
+    .theme-preview{
+      width:24px;height:24px;border-radius:6px;flex-shrink:0;
+      border:1px solid var(--border-softer)
+    }
+
+    .custom-theme-panel {
+      display: none;
+      padding: 10px;
+      background: rgba(0,0,0,.2);
+      border-radius: 10px;
+      margin-top: 4px;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .custom-theme-panel.show { display: flex; }
+    .custom-theme-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .custom-theme-row label {
+      font-size: 11px;
+      color: var(--text-muted);
+      min-width: 50px;
+    }
+    .custom-theme-row input[type="color"] {
+      width: 40px;
+      height: 30px;
+      border: 1px solid var(--border-softer);
+      border-radius: 6px;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+    .custom-theme-apply {
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform .15s ease;
+    }
+    .custom-theme-apply:hover { transform: translateY(-1px); }
+    .custom-color-divider {
+      height: 1px;
+      background: var(--border-soft);
+      margin: 4px 0;
+    }
+
+    .logo-container{width:90px;height:90px;margin:0 auto 20px;position:relative}
+    .logo-ring{
+      position:absolute;top:0;left:0;width:100%;height:100%;
+      border:3px solid transparent;
+      border-top-color:var(--brand-1);border-right-color:var(--brand-2);
+      border-radius:50%;animation:spin 3s linear infinite;will-change:transform;
+      transition:border-color .3s ease
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .logo{
+      width:100%;height:100%;background:linear-gradient(135deg,var(--brand-1),var(--brand-2));
+      border-radius:50%;display:flex;align-items:center;justify-content:center;
+      font-size:38px;color:#fff;box-shadow:0 10px 40px rgba(var(--brand-glow),.4);
+      transition:background .3s ease,box-shadow .3s ease
+    }
+    .title{
+      font-size:28px;font-weight:700;margin-bottom:8px;
+      background:linear-gradient(135deg,var(--brand-1),var(--brand-2));
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+      transition:background .3s ease
+    }
+    .subtitle{font-size:14px;color:var(--text-sub);font-weight:400;transition:color .4s ease}
+    .server-info{
+      background:rgba(var(--brand-glow),.1);
+      border:1px solid rgba(var(--brand-glow),.3);border-radius:16px;
+      padding:15px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;
+      gap:12px;cursor:pointer;transition:background .2s ease,transform .2s ease,border-color .3s ease
+    }
+    .server-info:hover{background:rgba(var(--brand-glow),.15);transform:translateY(-2px)}
+    .server-info-left{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
+    .server-info-left i{color:var(--brand-1);font-size:20px;flex-shrink:0;transition:color .3s ease}
+    .server-details{flex:1;min-width:0}
+    .server-name{display:block;font-weight:600;font-size:14px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-main);transition:color .4s ease}
+    .server-stats{display:flex;gap:15px;font-size:12px;color:var(--text-sub);flex-wrap:wrap;transition:color .4s ease}
+    .server-stat{display:flex;align-items:center;gap:4px;white-space:nowrap}
+    .server-stat i{font-size:10px}
+    .server-stat i.fa-circle{color:var(--brand-3) !important;transition:color .3s ease}
+    .change-server-btn{
+      background:var(--input-bg);border:1px solid var(--border-softer);color:var(--text-main);
+      padding:8px 14px;border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;
+      transition:background .2s ease,color .4s ease,border-color .4s ease;white-space:nowrap;font-family:inherit;
+      display:flex;align-items:center;gap:6px
+    }
+
+    .action-grid{
+      display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px
+    }
+    .action-btn{
+      background:rgba(var(--brand-glow),.12);
+      border:1px solid rgba(var(--brand-glow),.35);
+      color:var(--text-main);padding:14px 16px;border-radius:14px;
+      cursor:pointer;font-size:14px;font-weight:600;font-family:inherit;
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      transition:transform .2s ease,background .2s ease,color .4s ease;text-align:center
+    }
+    .action-btn:hover{background:rgba(var(--brand-glow),.22);transform:translateY(-2px)}
+    .action-btn .icon{font-size:22px;line-height:1}
+    .action-btn .label{font-size:13px;opacity:.95}
+
+    .server-selection{
+      display:none;background:var(--server-bg);border:1px solid var(--border-soft);
+      border-radius:16px;padding:20px;margin-bottom:20px;max-height:340px;overflow-y:auto;
+      -webkit-overflow-scrolling:touch;transition:background .4s ease,border-color .4s ease
+    }
+    .server-selection.show{display:block}
+    .server-selection-title{font-size:16px;font-weight:600;margin-bottom:15px;color:var(--text-main);text-align:center;padding:0 4px;transition:color .4s ease}
+    .server-grid{display:grid;grid-template-columns:1fr;gap:10px}
+    .server-option{
+      background:var(--server-option-bg);border:1px solid var(--border-soft);
+      border-radius:12px;padding:15px;cursor:pointer;
+      transition:background .2s ease,border-color .2s ease;
+      display:flex;align-items:center;justify-content:space-between
+    }
+    .server-option:hover{background:rgba(var(--brand-glow),.1);border-color:rgba(102,126,234,.3)}
+    .server-option.selected{background:rgba(var(--brand-glow),.15);border-color:var(--brand-1)}
+    .server-option-name{font-weight:500;font-size:14px;color:var(--text-main);transition:color .4s ease}
+    .server-option-stats{display:flex;gap:10px;font-size:12px;color:var(--text-sub);transition:color .4s ease}
+
+    .info-box{
+      background:rgba(var(--brand-glow),.1);
+      border:1px solid rgba(var(--brand-glow),.3);border-radius:16px;
+      padding:18px;margin-bottom:25px;display:flex;align-items:flex-start;gap:12px;
+      transition:background .3s ease,border-color .3s ease
+    }
+    .info-box i{color:var(--brand-1);font-size:20px;margin-top:2px;transition:color .3s ease}
+    .info-box-text{flex:1}
+    .info-box-text strong{display:block;margin-bottom:4px;font-size:15px;color:var(--text-main);transition:color .4s ease}
+    .info-box-text p{font-size:13px;color:var(--text-sub);line-height:1.5;transition:color .4s ease}
+    .form-group{margin-bottom:20px}
+    .label{display:block;margin-bottom:10px;font-weight:500;font-size:14px;color:var(--text-main);transition:color .4s ease}
+    .input-wrapper{position:relative}
+    .input-icon{
+      position:absolute;left:20px;top:50%;transform:translateY(-50%);
+      color:var(--text-muted);font-size:18px;pointer-events:none;transition:color .4s ease
+    }
+    .input{
+      width:100%;padding:16px 20px 16px 55px;background:var(--input-bg);
+      border:2px solid var(--border-soft);border-radius:16px;color:var(--text-main);
+      font-size:15px;font-family:inherit;
+      transition:border-color .2s ease,background .2s ease,color .4s ease;
+      -webkit-appearance:none;appearance:none
+    }
+    .input:focus{outline:none;border-color:var(--brand-1);background:var(--input-bg-focus)}
+    .input::placeholder{color:var(--text-muted)}
+    .hint{font-size:12px;color:var(--text-muted);margin-top:8px;display:flex;align-items:center;gap:6px;transition:color .4s ease}
+    .hint i{font-size:11px}
+    .btn{
+      width:100%;padding:16px;border:none;border-radius:16px;font-size:16px;font-weight:600;
+      font-family:inherit;cursor:pointer;
+      transition:transform .15s ease,box-shadow .15s ease,opacity .15s ease;
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      -webkit-appearance:none;appearance:none
+    }
+    .btn-generate{
+      background:linear-gradient(135deg,var(--brand-1),var(--brand-2));color:#fff;
+      box-shadow:0 10px 30px rgba(var(--brand-glow),.3);margin-bottom:15px;
+      transition:transform .15s ease,box-shadow .3s ease,background .3s ease;
+      position:relative;overflow:hidden
+    }
+    .btn-generate:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 15px 40px rgba(var(--brand-glow),.5)}
+    .btn-generate:disabled{opacity:.6;cursor:not-allowed}
+    .btn-copy{background:var(--input-bg);color:var(--text-main);border:1px solid var(--border-softer);display:none;transition:background .3s ease,color .4s ease}
+    .loading{display:none;text-align:center;margin:20px 0}
+    .spinner{
+      width:45px;height:45px;border:4px solid rgba(102,126,234,.2);border-radius:50%;
+      border-top-color:var(--brand-1);animation:spin 1s linear infinite;margin:0 auto 12px;
+      transition:border-top-color .3s ease
+    }
+    .loading-text{color:var(--text-sub);font-size:14px;transition:color .4s ease}
+    .code-box{
+      background:var(--code-box-bg);border:2px solid var(--border-soft);border-radius:16px;
+      padding:20px;text-align:center;margin-bottom:15px;min-height:70px;
+      display:flex;align-items:center;justify-content:center;
+      transition:border-color .2s ease,background .3s ease
+    }
+    .code-box.has-code{border-color:rgba(var(--brand-glow),.5);background:rgba(var(--brand-glow),.05)}
+    .code-box.has-error{border-color:rgba(255,107,107,.5);background:rgba(255,107,107,.05)}
+    .code-placeholder{color:var(--text-muted);font-size:14px;transition:color .4s ease}
+    .code-value{
+      font-size:24px;font-weight:700;letter-spacing:3px;color:var(--brand-3);
+      font-family:'Courier New',monospace;display:flex;align-items:center;gap:12px;word-break:break-all;
+      transition:color .3s ease
+    }
+    .code-value i{font-size:22px}
+    .error-value{color:#ff6b6b;font-size:14px;display:flex;align-items:center;gap:10px}
+    .footer{text-align:center;margin-top:25px;padding-top:20px;border-top:1px solid var(--border-soft);transition:border-color .4s ease}
+    .footer-text{font-size:12px;color:var(--text-muted);transition:color .4s ease}
+    .toast{
+      position:fixed;bottom:30px;left:50%;
+      transform:translateX(-50%) translateY(150px);
+      background:linear-gradient(135deg,var(--brand-1),var(--brand-2));color:#fff;
+      padding:14px 24px;border-radius:50px;font-weight:500;
+      box-shadow:0 10px 40px rgba(var(--brand-glow),.4);
+      transition:transform .35s cubic-bezier(.68,-.55,.265,1.55),opacity .35s ease,background .3s ease;
+      z-index:1000;opacity:0;display:flex;align-items:center;gap:10px;font-size:14px;
+      max-width:90vw;pointer-events:none
+    }
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+    .toast.error{background:#ff6b6b}
+
+    .auto-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(var(--brand-glow), .2);
+      border: 1px solid rgba(var(--brand-glow), .5);
+      border-radius: 20px;
+      padding: 2px 8px; margin-left: 6px;
+      font-size: 9px; font-weight: 700; color: var(--brand-2);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      vertical-align: middle;
+      animation: autoPulse 2s ease-in-out infinite;
+    }
+    @keyframes autoPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .6; }
+    }
+    .auto-badge i { font-size: 8px; }
+
+    .code-timer-wrap {
+      display: none;
+      margin-bottom: 12px;
+      background: var(--input-bg);
+      border-radius: 10px;
+      padding: 8px 12px;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .code-timer-wrap.show { display: flex; }
+    .code-timer-bar {
+      height: 4px;
+      background: var(--border-soft);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .code-timer-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand-1), var(--brand-2));
+      width: 100%;
+      transition: width 1s linear;
+      border-radius: 4px;
+    }
+    .code-timer-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    .history-panel {
+      display: none;
+      background: var(--server-bg);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 15px;
+      max-height: 220px;
+      overflow-y: auto;
+      transition: background .4s ease;
+    }
+    .history-panel.show { display: block; }
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .history-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .history-title i { color: var(--brand-2); }
+    .history-clear {
+      background: transparent;
+      border: none;
+      color: #ff6b6b;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: background .2s ease;
+    }
+    .history-clear:hover { background: rgba(255,107,107,.1); }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: var(--input-bg);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      font-size: 12px;
+      gap: 10px;
+    }
+    .history-item-code {
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      color: var(--brand-3);
+      letter-spacing: 1.5px;
+      flex-shrink: 0;
+    }
+    .history-item-info {
+      color: var(--text-muted);
+      font-size: 10px;
+      text-align: right;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .action-row {
+      display: none;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+    .action-row.show { display: flex; }
+    .action-row .btn {
+      flex: 1;
+      padding: 12px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      gap: 6px;
+    }
+    .btn-share {
+      background: rgba(37,211,102,.15);
+      color: #25d366;
+      border: 1px solid rgba(37,211,102,.4);
+    }
+    .btn-share:hover { background: rgba(37,211,102,.25); }
+    .btn-retry {
+      background: rgba(255,152,0,.15);
+      color: #ff9800;
+      border: 1px solid rgba(255,152,0,.4);
+    }
+    .btn-retry:hover { background: rgba(255,152,0,.25); }
+
+    .success-rate {
+      display: none;
+      font-size: 11px;
+      color: var(--text-sub);
+      text-align: center;
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      background: rgba(var(--brand-glow),.08);
+      border-radius: 8px;
+    }
+    .success-rate.show { display: block; }
+    .success-rate strong { color: var(--brand-2); }
+
+    .fav-panel {
+      display: none;
+      background: var(--server-bg);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    .fav-panel.show { display: block; }
+    .fav-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .fav-title i { color: #ffc107; }
+    .fav-empty {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 10px;
+    }
+    .fav-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: var(--input-bg);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background .2s ease;
+    }
+    .fav-item:hover { background: var(--input-bg-focus); }
+    .fav-item-name { color: var(--text-main); font-weight: 500; }
+    .fav-item-remove {
+      background: transparent;
+      border: none;
+      color: #ff6b6b;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: inherit;
+    }
+    .fav-item-remove:hover { background: rgba(255,107,107,.1); }
+
+    /* ✨ REFERRAL PANEL STYLES */
+    .referral-panel {
+      display: none;
+      background: var(--server-bg);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 15px;
+      animation: fadeIn .3s ease-out;
+    }
+    .referral-panel.show { display: block; }
+    .referral-title {
+      font-size: 14px; font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .referral-title i { color: var(--brand-2); }
+    .referral-code-box {
+      display: flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, rgba(var(--brand-glow),.15), rgba(var(--brand-glow),.05));
+      border: 1px dashed rgba(var(--brand-glow),.5);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .referral-code {
+      flex: 1;
+      font-family: 'Courier New', monospace;
+      font-weight: 700; font-size: 16px;
+      letter-spacing: 2px;
+      color: var(--brand-2);
+      text-align: center;
+    }
+    .referral-copy {
+      background: var(--brand-1); color: #fff;
+      border: none; border-radius: 8px;
+      padding: 8px 14px; font-size: 12px;
+      font-weight: 700; cursor: pointer;
+      font-family: inherit;
+      transition: transform .15s ease;
+    }
+    .referral-copy:hover { transform: translateY(-1px); }
+    .referral-stats {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px; margin-bottom: 10px;
+    }
+    .referral-stat {
+      background: var(--input-bg);
+      border-radius: 10px;
+      padding: 10px; text-align: center;
+    }
+    .referral-stat-value {
+      font-size: 22px; font-weight: 700;
+      color: var(--brand-2);
+    }
+    .referral-stat-label {
+      font-size: 10px; color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px; margin-top: 2px;
+    }
+    .referral-actions { display: flex; gap: 6px; }
+    .referral-actions .btn {
+      flex: 1; padding: 10px;
+      font-size: 12px; font-weight: 600;
+      display: flex; align-items: center;
+      justify-content: center; gap: 6px;
+    }
+    .btn-referral-share {
+      background: rgba(37,211,102,.15);
+      color: #25d366;
+      border: 1px solid rgba(37,211,102,.4);
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-referral-share:hover { background: rgba(37,211,102,.25); }
+
+    .auto-rotate-active {
+      animation: rotateSpin 2s linear infinite;
+      color: var(--brand-2) !important;
+    }
+    @keyframes rotateSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .confetti-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 16px;
+      opacity: 0;
+      animation: confettiSuccess 2.5s ease-out forwards;
+    }
+    @keyframes confettiSuccess {
+      0% { transform: translateY(-20px) rotate(0); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    .guide-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      z-index: 99998;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      pointer-events: none;
+    }
+    .guide-overlay.show { opacity: 1; visibility: visible; pointer-events: auto; }
+
+    .guide-highlight {
+      position: fixed;
+      border: 3px solid var(--brand-2);
+      border-radius: 18px;
+      box-shadow: 0 0 0 4px rgba(var(--brand-glow), .25), 0 0 40px rgba(var(--brand-glow), .8), inset 0 0 20px rgba(var(--brand-glow), .15);
+      z-index: 99999;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(.68,-.55,.265,1.55);
+      animation: pulseRing 1.8s ease-in-out infinite;
+    }
+    @keyframes pulseRing {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(var(--brand-glow), .25), 0 0 40px rgba(var(--brand-glow), .8), inset 0 0 20px rgba(var(--brand-glow), .15); }
+      50% { box-shadow: 0 0 0 8px rgba(var(--brand-glow), .15), 0 0 60px rgba(var(--brand-glow), 1), inset 0 0 30px rgba(var(--brand-glow), .25); }
+    }
+
+    .guide-tooltip {
+      position: fixed;
+      background: linear-gradient(135deg, rgba(20,20,30,.98), rgba(30,30,45,.98));
+      border: 2px solid var(--brand-2);
+      border-radius: 18px;
+      padding: 16px 18px;
+      max-width: 300px;
+      z-index: 100000;
+      box-shadow: 0 15px 50px rgba(0,0,0,.8), 0 0 40px rgba(var(--brand-glow),.4);
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.35s ease, visibility 0.35s ease, transform 0.35s cubic-bezier(.68,-.55,.265,1.55);
+      transform: scale(0.85) translateY(10px);
+      pointer-events: auto;
+      color: #fff;
+    }
+    .guide-tooltip.show { opacity: 1; visibility: visible; transform: scale(1) translateY(0); }
+    .guide-tooltip::after {
+      content: '';
+      position: absolute;
+      width: 16px; height: 16px;
+      background: linear-gradient(135deg, rgba(20,20,30,.98), rgba(30,30,45,.98));
+      border: 2px solid var(--brand-2);
+      transform: rotate(45deg);
+    }
+    .guide-tooltip.pos-top::after { bottom: -10px; left: 50%; margin-left: -8px; border-top: none; border-left: none; }
+    .guide-tooltip.pos-bottom::after { top: -10px; left: 50%; margin-left: -8px; border-bottom: none; border-right: none; }
+    .guide-tooltip.pos-left::after { right: -10px; top: 50%; margin-top: -8px; border-bottom: none; border-left: none; }
+    .guide-tooltip.pos-right::after { left: -10px; top: 50%; margin-top: -8px; border-top: none; border-right: none; }
+
+    .guide-step-count {
+      display: inline-block;
+      background: rgba(var(--brand-glow), .2);
+      border: 1px solid rgba(var(--brand-glow), .5);
+      color: var(--brand-2);
+      padding: 2px 8px; border-radius: 20px;
+      font-size: 10px; font-weight: 700;
+      margin-bottom: 8px; letter-spacing: 0.5px;
+    }
+    .guide-tooltip .guide-title {
+      font-size: 15px; font-weight: 700; color: #fff;
+      margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
+    }
+    .guide-tooltip .guide-title i { color: var(--brand-2); font-size: 16px; }
+    .guide-tooltip .guide-text {
+      font-size: 13px; color: rgba(255,255,255,.8);
+      line-height: 1.5; margin-bottom: 12px;
+    }
+    .guide-tooltip .guide-text strong { color: var(--brand-2); font-weight: 600; }
+    .guide-btn-row { display: flex; gap: 8px; }
+    .guide-btn-next {
+      flex: 1;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+      color: #fff; border: none; border-radius: 10px;
+      padding: 10px 14px; font-size: 13px; font-weight: 700; font-family: inherit;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: transform .15s ease, box-shadow .2s ease;
+      box-shadow: 0 4px 14px rgba(var(--brand-glow),.4);
+    }
+    .guide-btn-next:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(var(--brand-glow),.6); }
+    .guide-btn-skip {
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+      color: rgba(255,255,255,.7); border-radius: 10px;
+      padding: 10px 14px; font-size: 12px; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: background .2s ease;
+    }
+    .guide-btn-skip:hover { background: rgba(255,255,255,.15); color: #fff; }
+
+    .guide-pointer {
+      position: fixed; z-index: 100001; font-size: 32px;
+      pointer-events: none;
+      animation: pointerBounce 1s ease-in-out infinite;
+      filter: drop-shadow(0 4px 12px rgba(var(--brand-glow),.8));
+      transition: all 0.5s cubic-bezier(.68,-.55,.265,1.55);
+    }
+    @keyframes pointerBounce {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-8px, -8px); }
+    }
+
+    @media (max-width:580px){
+      .card{padding:35px 20px;border-radius:25px;backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg-card-mobile)}
+      .title{font-size:26px}
+      .logo-container{width:80px;height:80px}
+      .logo{font-size:34px}
+      .code-value{font-size:22px;letter-spacing:2px}
+      .top-controls{top:-4px;right:-6px;gap:5px}
+      .dropdown-btn{padding:5px 10px;font-size:10px}
+      .dropdown-btn svg{width:12px;height:12px}
+      .dropdown-btn .dot{width:8px;height:8px}
+      .dropdown-menu{min-width:220px;max-height:300px;padding:6px}
+      .lang-option{padding:8px 10px;font-size:12px;gap:8px}
+      .action-btn{padding:12px 14px;font-size:13px}
+      .action-btn .icon{font-size:20px}
+      .glow-orb{width:350px;height:350px;filter:blur(60px);opacity:.25}
+      .guide-tooltip{max-width: 260px; padding: 14px 16px;}
+      .guide-pointer{font-size: 28px;}
+      .icon-btn{width:28px;height:28px;font-size:12px;}
+      .quick-actions{max-width: 180px;}
+    }
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+      .particle{display:none}
+    }
+
+    .spin-modal{
+      position:fixed;inset:0;background:rgba(5,5,10,.92);
+      backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+      display:flex;align-items:center;justify-content:center;
+      z-index:9998;opacity:0;visibility:hidden;
+      transition:opacity .3s ease,visibility .3s ease;padding:20px
+    }
+    .spin-modal.show{opacity:1;visibility:visible}
+    .spin-container{
+      background:var(--dropdown-bg);border:2px solid rgba(var(--brand-glow),.3);
+      border-radius:24px;padding:26px 22px;max-width:400px;width:100%;
+      text-align:center;position:relative;overflow:hidden;
+      box-shadow:0 25px 80px rgba(0,0,0,.7),0 0 60px rgba(var(--brand-glow),.15);
+      transform:scale(.9);transition:transform .3s ease
+    }
+    .spin-modal.show .spin-container{transform:scale(1)}
+    .spin-title{
+      font-size:20px;font-weight:700;margin-bottom:6px;
+      background:linear-gradient(135deg,var(--brand-1),var(--brand-2));
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent
+    }
+    .spin-sub{font-size:12px;color:var(--text-sub);margin-bottom:18px}
+    .spin-wheel-wrap{position:relative;width:280px;height:280px;margin:0 auto 20px}
+    .spin-pointer{
+      position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+      width:0;height:0;
+      border-left:14px solid transparent;border-right:14px solid transparent;
+      border-top:22px solid var(--brand-1);
+      filter:drop-shadow(0 3px 6px rgba(0,0,0,.5));
+      z-index:5
+    }
+    .spin-wheel{
+      width:100%;height:100%;border-radius:50%;
+      position:relative;overflow:hidden;
+      border:6px solid var(--border-soft);
+      box-shadow:0 10px 40px rgba(0,0,0,.6),inset 0 0 30px rgba(0,0,0,.5);
+      transition:transform 4s cubic-bezier(.17,.67,.25,1);
+      background:conic-gradient(
+        #00c853 0deg 45deg,
+        #2196f3 45deg 90deg,
+        #9c27b0 90deg 135deg,
+        #f44336 135deg 180deg,
+        #ff9800 180deg 225deg,
+        #e91e63 225deg 270deg,
+        #00bcd4 270deg 315deg,
+        #7c4dff 315deg 360deg
+      )
+    }
+    .spin-wheel-label{
+      position:absolute;font-size:12px;font-weight:700;color:#fff;
+      text-shadow:0 2px 4px rgba(0,0,0,.9);
+      pointer-events:none;white-space:nowrap;
+      top:50%;left:50%
+    }
+    .spin-center{
+      position:absolute;top:50%;left:50%;
+      transform:translate(-50%,-50%);
+      width:56px;height:56px;border-radius:50%;
+      background:linear-gradient(135deg,var(--brand-1),var(--brand-2));
+      border:4px solid rgba(10,10,15,.9);
+      box-shadow:0 4px 20px rgba(0,0,0,.5),inset 0 -3px 8px rgba(0,0,0,.3);
+      display:flex;align-items:center;justify-content:center;
+      font-size:22px;color:#fff;z-index:4
+    }
+    .spin-btn{
+      width:100%;padding:14px;border:none;border-radius:14px;
+      background:linear-gradient(135deg,var(--brand-1),var(--brand-2));
+      color:#fff;font-size:15px;font-weight:700;font-family:inherit;
+      cursor:pointer;transition:transform .15s ease,box-shadow .2s ease;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      box-shadow:0 8px 24px rgba(var(--brand-glow),.35)
+    }
+    .spin-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 32px rgba(var(--brand-glow),.5)}
+    .spin-btn:disabled{opacity:.6;cursor:not-allowed}
+    .spin-close{
+      position:absolute;top:12px;right:12px;
+      background:var(--input-bg);border:none;color:var(--text-main);
+      width:32px;height:32px;border-radius:50%;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;font-size:16px;
+      transition:background .2s ease
+    }
+    .spin-close:hover{background:var(--input-bg-focus)}
+    .spin-result{
+      margin-top:14px;font-size:14px;font-weight:600;color:var(--brand-2);
+      min-height:20px
+    }
+    .confetti{
+      position:absolute;width:8px;height:14px;
+      top:-20px;opacity:0;pointer-events:none;
+      z-index:10
+    }
+    @keyframes confettiFall{
+      0%{transform:translateY(0) rotate(0);opacity:1}
+      100%{transform:translateY(400px) rotate(720deg);opacity:0}
+    }
+
+    .simple-darood-overlay {
+      position: fixed;inset: 0;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(8px);-webkit-backdrop-filter: blur(8px);
+      display: flex;align-items: center;justify-content: center;
+      z-index: 999999;opacity: 0;visibility: hidden;
+      transition: opacity 0.35s ease, visibility 0.35s ease;padding: 24px;
+    }
+    .simple-darood-overlay.show { opacity: 1; visibility: visible; }
+    .simple-darood-box {
+      background: rgba(15, 20, 18, 0.95);
+      border: 2px solid var(--brand-1);
+      border-radius: 20px;padding: 40px 30px;max-width: 380px;width: 100%;
+      text-align: center;box-shadow: 0 0 40px rgba(var(--brand-glow), 0.3);
+      transform: scale(0.9);transition: transform 0.35s ease, border-color .3s ease, box-shadow .3s ease;
+    }
+    .simple-darood-overlay.show .simple-darood-box { transform: scale(1); }
+    .simple-darood-box .title {
+      font-size: 22px;font-weight: 700;color: var(--brand-2);
+      margin-bottom: 15px;letter-spacing: 1px;transition:color .3s ease;
+    }
+    .simple-darood-box .arabic {
+      font-size: 28px;font-weight: 600;color: #ffffff;line-height: 1.6;
+      direction: rtl;font-family: 'Poppins', serif;
+    }
+    .simple-darood-box .divider {
+      width: 50px;height: 2px;background: var(--brand-1);
+      margin: 20px auto;border-radius: 2px;transition:background .3s ease;
+    }
+
+    .tutorial-btn {
+      position: fixed;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+      color: #fff;
+      border: none;
+      border-radius: 30px 0 0 30px;
+      padding: 14px 18px 14px 20px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 9997;
+      box-shadow: 0 8px 24px rgba(var(--brand-glow),.5);
+      transition: transform .25s ease, padding .25s ease, box-shadow .25s ease;
+      animation: tutorialPulse 3s ease-in-out infinite;
+    }
+    .tutorial-btn:hover {
+      transform: translateY(-50%) translateX(-4px);
+      box-shadow: 0 12px 32px rgba(var(--brand-glow),.7);
+    }
+    .tutorial-btn:active {
+      transform: translateY(-50%) translateX(0) scale(.97);
+    }
+    .tutorial-btn i { font-size: 18px; }
+    .tutorial-label {
+      font-size: 13px;
+      letter-spacing: 0.3px;
+      max-width: 60px;
+      overflow: hidden;
+    }
+    @keyframes tutorialPulse {
+      0%, 100% { box-shadow: 0 8px 24px rgba(var(--brand-glow),.5), 0 0 0 0 rgba(var(--brand-glow),.6); }
+      50% { box-shadow: 0 8px 24px rgba(var(--brand-glow),.5), 0 0 0 12px rgba(var(--brand-glow),0); }
+    }
+    .tutorial-btn.hidden { display: none; }
+
+    @media (max-width: 580px) {
+      .tutorial-btn {
+        right: 0;
+        padding: 12px 14px 12px 16px;
+        font-size: 12px;
+      }
+      .tutorial-btn i { font-size: 16px; }
+      .tutorial-label { max-width: 46px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  <div class="particles-bg" id="particlesBg"></div>
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <div class="container">
+    <div class="card" id="mainCard">
+      <div class="header">
+        <div class="top-controls">
+          <div class="quick-actions">
+            <button class="icon-btn" id="themeModeToggle" type="button" title="Light/Dark Mode">
+              <i class="fas fa-moon" id="themeModeIcon"></i>
+            </button>
+            <button class="icon-btn" id="soundToggle" type="button" title="Sound On/Off">
+              <i class="fas fa-volume-up" id="soundIcon"></i>
+            </button>
+            <button class="icon-btn" id="historyToggle" type="button" title="Recent History">
+              <i class="fas fa-history"></i>
+              <span class="badge-dot" id="historyDot"></span>
+            </button>
+            <button class="icon-btn" id="favToggle" type="button" title="Favorites">
+              <i class="fas fa-star"></i>
+              <span class="badge-dot" id="favDot"></span>
+            </button>
+            <button class="icon-btn" id="referralToggle" type="button" title="Refer & Earn">
+              <i class="fas fa-gift"></i>
+              <span class="ref-badge" id="refBadge">0</span>
+            </button>
+            <button class="icon-btn" id="autoRotateToggle" type="button" title="Auto Theme Rotate">
+              <i class="fas fa-magic" id="autoRotateIcon"></i>
+            </button>
+          </div>
+
+          <div class="dropdown-wrap" style="position:relative">
+            <button class="dropdown-btn" id="langToggle" type="button">
+              <svg viewBox="0 0 24 24"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+              <span id="currentLangLabel">Language</span>
+              <span class="arrow">▼</span>
+            </button>
+            <div class="dropdown-menu" id="langMenu"></div>
+          </div>
+
+          <div class="dropdown-wrap" style="position:relative">
+            <button class="dropdown-btn" id="themeToggle" type="button">
+              <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+              <span class="dot"></span>
+              <span id="themeLabel">Theme</span>
+              <span class="arrow">▼</span>
+            </button>
+            <div class="dropdown-menu themes" id="themeMenu"></div>
+          </div>
+        </div>
+        <div class="logo-container">
+          <div class="logo-ring"></div>
+          <div class="logo">
+            <i class="fas fa-bolt"></i>
+          </div>
+        </div>
+        <h1 class="title">AHMAD-MD</h1>
+        <p class="subtitle" id="subtitleText">Generate Your Pairing Code</p>
+      </div>
+
+      <div class="success-rate" id="successRate"></div>
+
+      <div class="fav-panel" id="favPanel">
+        <div class="fav-title"><i class="fas fa-star"></i> <span id="favTitleText">Favorites</span></div>
+        <div id="favList"></div>
+      </div>
+
+      <div class="history-panel" id="historyPanel">
+        <div class="history-header">
+          <div class="history-title"><i class="fas fa-history"></i> <span id="historyTitleText">Recent History</span></div>
+          <button class="history-clear" id="historyClear" type="button">Clear</button>
+        </div>
+        <div id="historyList"></div>
+      </div>
+
+      <div class="referral-panel" id="referralPanel">
+        <div class="referral-title"><i class="fas fa-gift"></i> <span>🎁 Refer & Earn</span></div>
+        <div class="referral-code-box">
+          <span class="referral-code" id="referralCode">------</span>
+          <button class="referral-copy" id="copyReferralBtn" type="button">Copy</button>
+        </div>
+        <div class="referral-stats">
+          <div class="referral-stat">
+            <div class="referral-stat-value" id="refCount">0</div>
+            <div class="referral-stat-label">Referrals</div>
+          </div>
+          <div class="referral-stat">
+            <div class="referral-stat-value" id="refPoints">0</div>
+            <div class="referral-stat-label">Points</div>
+          </div>
+        </div>
+        <div class="referral-actions">
+          <button class="btn btn-referral-share" id="shareReferralBtn" type="button">
+            <i class="fas fa-share-alt"></i>
+            <span>Share Link</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="server-info" id="serverInfo">
+        <div class="server-info-left">
+          <i class="fas fa-server"></i>
+          <div class="server-details">
+            <span class="server-name" id="currentServerName">
+              <span id="serverNameText">Auto Selecting...</span>
+              <span class="auto-badge" id="autoBadge"><i class="fas fa-bolt"></i>AUTO</span>
+            </span>
+            <div class="server-stats">
+              <span class="server-stat" id="activeCount">
+                <i class="fas fa-circle"></i>
+                <span id="activeText">Active: --</span>
+              </span>
+              <span class="server-stat" id="serverLimit">
+                <i class="fas fa-users"></i>
+                <span id="limitText">Limit: --/50</span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <button class="change-server-btn" type="button" onclick="showServerSelection()">
+          <i class="fas fa-chevron-down"></i>
+          <span id="selectBtnText">Change</span>
+        </button>
+      </div>
+
+      <div class="action-grid">
+        <button class="action-btn" type="button" onclick="reselectRandomServer()" id="autoServerBtn">
+          <span class="icon">🔄</span>
+          <span class="label" id="autoServerLabel">Auto New Server</span>
+        </button>
+        <button class="action-btn" type="button" onclick="openSpinWheel()">
+          <span class="icon">🎰</span>
+          <span class="label" id="spinLabel">Lucky Spin</span>
+        </button>
+      </div>
+
+      <div class="server-selection" id="serverSelection">
+        <div class="server-selection-title" id="serverSelectionTitle">✦ Select a Server ✦</div>
+        <div class="server-grid" id="serverGrid"></div>
+      </div>
+
+      <div class="info-box">
+        <i class="fas fa-info-circle"></i>
+        <div class="info-box-text">
+          <strong id="quickSetupTitle">Quick Setup</strong>
+          <p id="quickSetupDesc">Server is auto-selected for best performance. Just enter your WhatsApp number to instantly generate a pairing code!</p>
+        </div>
+      </div>
+
+      <form id="pairForm">
+        <div class="form-group">
+          <label class="label" id="phoneLabel">WhatsApp Number</label>
+          <div class="input-wrapper">
+            <input type="tel" id="phoneNumber" class="input" placeholder="9232591xxxxx" pattern="[0-9]+" inputmode="numeric" autocomplete="tel" required>
+            <i class="fas fa-phone input-icon"></i>
+          </div>
+          <div class="hint">
+            <i class="fas fa-lightbulb"></i>
+            <span id="phoneHint">Include country code (e.g., 92 for Pakistan)</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-generate" id="generateBtn">
+          <i class="fas fa-key"></i>
+          <span id="generateBtnText">Generate Pair Code</span>
+        </button>
+
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <p class="loading-text" id="loadingText">Generating your pair code...</p>
+        </div>
+
+        <div class="code-box" id="codeBox">
+          <div class="code-placeholder" id="codePlaceholder">Your pairing code will appear here</div>
+        </div>
+
+        <div class="code-timer-wrap" id="codeTimerWrap">
+          <div class="code-timer-bar"><div class="code-timer-fill" id="codeTimerFill"></div></div>
+          <div class="code-timer-text">
+            <span id="codeTimerLabel">Code expires in</span>
+            <span id="codeTimerValue">30s</span>
+          </div>
+        </div>
+
+        <div class="action-row" id="actionRow">
+          <button type="button" class="btn btn-copy" id="copyBtn" style="display:flex">
+            <i class="fas fa-copy"></i>
+            <span id="copyBtnText">Copy</span>
+          </button>
+          <button type="button" class="btn btn-share" id="shareBtn">
+            <i class="fas fa-share-alt"></i>
+            <span id="shareBtnText">Share</span>
+          </button>
+          <button type="button" class="btn btn-retry" id="retryBtn">
+            <i class="fas fa-redo"></i>
+            <span id="retryBtnText">Retry</span>
+          </button>
+        </div>
+      </form>
+
+      <div class="footer">
+        <p class="footer-text" id="footerText">© 2026 AHMAD-MD | Powered By ahmadTech</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="spin-modal" id="spinModal">
+    <div class="spin-container" id="spinContainer">
+      <button class="spin-close" type="button" onclick="closeSpinWheel()">✕</button>
+      <div class="spin-title" id="spinTitle">🎰 Lucky Spin</div>
+      <div class="spin-sub" id="spinSub">Spin and get a random server!</div>
+      <div class="spin-wheel-wrap">
+        <div class="spin-pointer"></div>
+        <div class="spin-wheel" id="spinWheel">
+          <div class="spin-center">⚡</div>
+        </div>
+      </div>
+      <button class="spin-btn" id="spinBtn" type="button" onclick="spinWheel()">
+        <i class="fas fa-sync"></i>
+        <span id="spinBtnText">SPIN</span>
+      </button>
+      <div class="spin-result" id="spinResult"></div>
+    </div>
+  </div>
+
+  <div class="guide-overlay" id="guideOverlay"></div>
+  <div class="guide-highlight" id="guideHighlight" style="display:none"></div>
+  <div class="guide-pointer" id="guidePointer" style="display:none">👆</div>
+  <div class="guide-tooltip" id="guideTooltip">
+    <span class="guide-step-count" id="guideStepCount">STEP 1/10</span>
+    <div class="guide-title">
+      <i class="fas fa-hand-pointer" id="guideIcon"></i>
+      <span id="guideTitle">Welcome!</span>
+    </div>
+    <div class="guide-text" id="guideText">Let me show you around.</div>
+    <div class="guide-btn-row">
+      <button class="guide-btn-next" type="button" onclick="nextGuideStep()">
+        <span id="guideNextText">Next</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+      <button class="guide-btn-skip" type="button" onclick="skipGuide()">Skip</button>
+    </div>
+  </div>
+
+  <button class="tutorial-btn hidden" id="tutorialBtn" type="button" onclick="restartGuide()" title="Learn Tutorial">
+    <i class="fas fa-graduation-cap"></i>
+    <span class="tutorial-label" id="tutorialLabel">Learn</span>
+  </button>
+
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMessage">Code copied successfully</span>
+  </div>
+
+  <div class="confetti-container" id="confettiContainer"></div>
+
+  <script>
+    'use strict';
+
+    // ============================================================
+    // 13 LANGUAGES
+    // ============================================================
+    const LANGUAGES = [
+      { code: 'en', name: 'English', flag: '🇬🇧', rtl: false },
+      { code: 'ur_roman', name: 'Roman Urdu', flag: '🇵🇰', rtl: false },
+      { code: 'ur', name: 'اردو (Urdu)', flag: '🇵🇰', rtl: true },
+      { code: 'ps', name: 'پښتو (Pashto)', flag: '🇦🇫', rtl: true },
+      { code: 'fa', name: 'دری (Dari)', flag: '🇦🇫', rtl: true },
+      { code: 'hi', name: 'हिन्दी (Hindi)', flag: '🇮🇳', rtl: false },
+      { code: 'bn', name: 'বাংলা (Bengali)', flag: '🇧🇩', rtl: false },
+      { code: 'sw', name: 'Kiswahili (Tanzania)', flag: '🇹🇿', rtl: false },
+      { code: 'ht', name: 'Kreyòl Ayisyen', flag: '🇭🇹', rtl: false },
+      { code: 'ar_ma', name: 'العربية (المغرب)', flag: '🇲🇦', rtl: true },
+      { code: 'sw_ug', name: 'Kiswahili (Uganda)', flag: '🇺🇬', rtl: false },
+      { code: 'ar_sa', name: 'العربية (السعودية)', flag: '🇸🇦', rtl: true },
+      { code: 'ha_ng', name: 'Hausa (Najeriya)', flag: '🇳🇬', rtl: false }
+    ];
+
+    // ============================================================
+    // 50 THEME COLORS + CUSTOM
+    // ============================================================
+    const THEMES = [
+      { id: 'green', name: 'Classic Green', b1: '#00c853', b2: '#00e676', b3: '#00d4aa', glow: '0,200,83', preview: 'linear-gradient(135deg,#00c853,#00e676)' },
+      { id: 'ocean', name: 'Ocean Blue', b1: '#2196f3', b2: '#00bcd4', b3: '#4fc3f7', glow: '33,150,243', preview: 'linear-gradient(135deg,#2196f3,#00bcd4)' },
+      { id: 'sunset', name: 'Sunset Orange', b1: '#ff5722', b2: '#ff9800', b3: '#ffb74d', glow: '255,87,34', preview: 'linear-gradient(135deg,#ff5722,#ff9800)' },
+      { id: 'royal', name: 'Royal Purple', b1: '#7c4dff', b2: '#e91e63', b3: '#f48fb1', glow: '124,77,255', preview: 'linear-gradient(135deg,#7c4dff,#e91e63)' },
+      { id: 'fire', name: 'Fire Red', b1: '#f44336', b2: '#ff9800', b3: '#ffcc80', glow: '244,67,54', preview: 'linear-gradient(135deg,#f44336,#ff9800)' },
+      { id: 'nature', name: 'Nature Green', b1: '#009688', b2: '#8bc34a', b3: '#aed581', glow: '0,150,136', preview: 'linear-gradient(135deg,#009688,#8bc34a)' },
+      { id: 'pink', name: 'Sweet Pink', b1: '#e91e63', b2: '#f06292', b3: '#f48fb1', glow: '233,30,99', preview: 'linear-gradient(135deg,#e91e63,#f06292)' },
+      { id: 'cyber', name: 'Cyber Cyan', b1: '#00bcd4', b2: '#3f51b5', b3: '#7986cb', glow: '0,188,212', preview: 'linear-gradient(135deg,#00bcd4,#3f51b5)' },
+      { id: 'gold', name: 'Golden', b1: '#ffc107', b2: '#ff9800', b3: '#ffd54f', glow: '255,193,7', preview: 'linear-gradient(135deg,#ffc107,#ff9800)' },
+      { id: 'midnight', name: 'Midnight', b1: '#3f51b5', b2: '#7c4dff', b3: '#9fa8da', glow: '63,81,181', preview: 'linear-gradient(135deg,#3f51b5,#7c4dff)' },
+      { id: 'mint', name: 'Mint Fresh', b1: '#00bcd4', b2: '#00e676', b3: '#69f0ae', glow: '0,188,212', preview: 'linear-gradient(135deg,#00bcd4,#00e676)' },
+      { id: 'lavender', name: 'Lavender', b1: '#9c27b0', b2: '#ba68c8', b3: '#e1bee7', glow: '156,39,176', preview: 'linear-gradient(135deg,#9c27b0,#ba68c8)' },
+      { id: 'crimson', name: 'Crimson', b1: '#d32f2f', b2: '#e57373', b3: '#ef9a9a', glow: '211,47,47', preview: 'linear-gradient(135deg,#d32f2f,#e57373)' },
+      { id: 'lime', name: 'Lime Zest', b1: '#cddc39', b2: '#aeea00', b3: '#d4e157', glow: '205,220,57', preview: 'linear-gradient(135deg,#cddc39,#aeea00)' },
+      { id: 'emerald', name: 'Emerald', b1: '#2e7d32', b2: '#4caf50', b3: '#81c784', glow: '46,125,50', preview: 'linear-gradient(135deg,#2e7d32,#4caf50)' },
+      { id: 'sky', name: 'Sky Blue', b1: '#03a9f4', b2: '#4fc3f7', b3: '#81d4fa', glow: '3,169,244', preview: 'linear-gradient(135deg,#03a9f4,#4fc3f7)' },
+      { id: 'coral', name: 'Coral', b1: '#ff7043', b2: '#ff8a65', b3: '#ffab91', glow: '255,112,67', preview: 'linear-gradient(135deg,#ff7043,#ff8a65)' },
+      { id: 'plum', name: 'Plum', b1: '#673ab7', b2: '#9575cd', b3: '#b39ddb', glow: '103,58,183', preview: 'linear-gradient(135deg,#673ab7,#9575cd)' },
+      { id: 'rose', name: 'Rose Gold', b1: '#e91e63', b2: '#ff4081', b3: '#ff80ab', glow: '233,30,99', preview: 'linear-gradient(135deg,#e91e63,#ff4081)' },
+      { id: 'silver', name: 'Silver', b1: '#78909c', b2: '#b0bec5', b3: '#cfd8dc', glow: '120,144,156', preview: 'linear-gradient(135deg,#78909c,#b0bec5)' },
+      { id: 'bronze', name: 'Bronze', b1: '#bf360c', b2: '#e64a19', b3: '#ff7043', glow: '191,54,12', preview: 'linear-gradient(135deg,#bf360c,#e64a19)' },
+      { id: 'neon', name: 'Neon Pink', b1: '#ff0080', b2: '#ff00ff', b3: '#ff80ff', glow: '255,0,128', preview: 'linear-gradient(135deg,#ff0080,#ff00ff)' },
+      { id: 'matrix', name: 'Matrix Green', b1: '#00ff41', b2: '#00c853', b3: '#69f0ae', glow: '0,255,65', preview: 'linear-gradient(135deg,#00ff41,#00c853)' },
+      { id: 'royalblue', name: 'Royal Blue', b1: '#1a237e', b2: '#3f51b5', b3: '#7986cb', glow: '26,35,126', preview: 'linear-gradient(135deg,#1a237e,#3f51b5)' },
+      { id: 'teal', name: 'Teal Breeze', b1: '#00695c', b2: '#26a69a', b3: '#80cbc4', glow: '0,105,92', preview: 'linear-gradient(135deg,#00695c,#26a69a)' },
+      { id: 'indigo', name: 'Indigo Night', b1: '#283593', b2: '#5c6bc0', b3: '#9fa8da', glow: '40,53,147', preview: 'linear-gradient(135deg,#283593,#5c6bc0)' },
+      { id: 'peach', name: 'Peach', b1: '#ff7043', b2: '#ffab91', b3: '#ffccbc', glow: '255,112,67', preview: 'linear-gradient(135deg,#ff7043,#ffab91)' },
+      { id: 'aqua', name: 'Aqua Marine', b1: '#00b8d4', b2: '#18ffff', b3: '#84ffff', glow: '0,184,212', preview: 'linear-gradient(135deg,#00b8d4,#18ffff)' },
+      { id: 'violet', name: 'Violet Dream', b1: '#6a1b9a', b2: '#ab47bc', b3: '#ce93d8', glow: '106,27,154', preview: 'linear-gradient(135deg,#6a1b9a,#ab47bc)' },
+      { id: 'chocolate', name: 'Chocolate', b1: '#4e342e', b2: '#8d6e63', b3: '#bcaaa4', glow: '78,52,46', preview: 'linear-gradient(135deg,#4e342e,#8d6e63)' },
+      { id: 'steel', name: 'Steel Gray', b1: '#455a64', b2: '#78909c', b3: '#b0bec5', glow: '69,90,100', preview: 'linear-gradient(135deg,#455a64,#78909c)' },
+      { id: 'cherry', name: 'Cherry Red', b1: '#c62828', b2: '#ef5350', b3: '#ef9a9a', glow: '198,40,40', preview: 'linear-gradient(135deg,#c62828,#ef5350)' },
+      { id: 'forest', name: 'Forest', b1: '#1b5e20', b2: '#43a047', b3: '#a5d6a7', glow: '27,94,32', preview: 'linear-gradient(135deg,#1b5e20,#43a047)' },
+      { id: 'sapphire', name: 'Sapphire', b1: '#0d47a1', b2: '#1976d2', b3: '#64b5f6', glow: '13,71,161', preview: 'linear-gradient(135deg,#0d47a1,#1976d2)' },
+      { id: 'mango', name: 'Mango Yellow', b1: '#f57f17', b2: '#fbc02d', b3: '#fff176', glow: '245,127,23', preview: 'linear-gradient(135deg,#f57f17,#fbc02d)' },
+      { id: 'turquoise', name: 'Turquoise', b1: '#00838f', b2: '#00acc1', b3: '#4dd0e1', glow: '0,131,143', preview: 'linear-gradient(135deg,#00838f,#00acc1)' },
+      { id: 'magenta', name: 'Magenta', b1: '#ad1457', b2: '#e91e63', b3: '#f48fb1', glow: '173,20,87', preview: 'linear-gradient(135deg,#ad1457,#e91e63)' },
+      { id: 'olive', name: 'Olive Green', b1: '#33691e', b2: '#689f38', b3: '#aed581', glow: '51,105,30', preview: 'linear-gradient(135deg,#33691e,#689f38)' },
+      { id: 'rust', name: 'Rust', b1: '#a0522d', b2: '#cd853f', b3: '#deb887', glow: '160,82,45', preview: 'linear-gradient(135deg,#a0522d,#cd853f)' },
+      { id: 'denim', name: 'Denim', b1: '#1565c0', b2: '#42a5f5', b3: '#90caf9', glow: '21,101,192', preview: 'linear-gradient(135deg,#1565c0,#42a5f5)' },
+      { id: 'grape', name: 'Grape', b1: '#4a148c', b2: '#7b1fa2', b3: '#ba68c8', glow: '74,20,140', preview: 'linear-gradient(135deg,#4a148c,#7b1fa2)' },
+      { id: 'salmon', name: 'Salmon', b1: '#e57373', b2: '#ff8a80', b3: '#ffab91', glow: '229,115,115', preview: 'linear-gradient(135deg,#e57373,#ff8a80)' },
+      { id: 'ice', name: 'Ice Blue', b1: '#b3e5fc', b2: '#81d4fa', b3: '#e1f5fe', glow: '179,229,252', preview: 'linear-gradient(135deg,#b3e5fc,#81d4fa)' },
+      { id: 'blood', name: 'Blood Red', b1: '#b71c1c', b2: '#f44336', b3: '#e57373', glow: '183,28,28', preview: 'linear-gradient(135deg,#b71c1c,#f44336)' },
+      { id: 'lava', name: 'Lava', b1: '#dd2c00', b2: '#ff6d00', b3: '#ffab40', glow: '221,44,0', preview: 'linear-gradient(135deg,#dd2c00,#ff6d00)' },
+      { id: 'twilight', name: 'Twilight', b1: '#311b92', b2: '#5e35b1', b3: '#9575cd', glow: '49,27,146', preview: 'linear-gradient(135deg,#311b92,#5e35b1)' },
+      { id: 'sakura', name: 'Sakura', b1: '#f8bbd0', b2: '#f48fb1', b3: '#fce4ec', glow: '248,187,208', preview: 'linear-gradient(135deg,#f8bbd0,#f48fb1)' },
+      { id: 'mocha', name: 'Mocha', b1: '#5d4037', b2: '#a1887f', b3: '#d7ccc8', glow: '93,64,55', preview: 'linear-gradient(135deg,#5d4037,#a1887f)' },
+      { id: 'jade', name: 'Jade', b1: '#004d40', b2: '#00897b', b3: '#4db6ac', glow: '0,77,64', preview: 'linear-gradient(135deg,#004d40,#00897b)' },
+      { id: 'amber', name: 'Amber', b1: '#ff6f00', b2: '#ffa000', b3: '#ffca28', glow: '255,111,0', preview: 'linear-gradient(135deg,#ff6f00,#ffa000)' },
+      { id: 'cobalt', name: 'Cobalt', b1: '#0047ab', b2: '#2962ff', b3: '#82b1ff', glow: '0,71,171', preview: 'linear-gradient(135deg,#0047ab,#2962ff)' },
+      { id: 'bubblegum', name: 'Bubblegum', b1: '#ff4081', b2: '#ff80ab', b3: '#ffc1e3', glow: '255,64,129', preview: 'linear-gradient(135deg,#ff4081,#ff80ab)' }
+    ];
+
+    // ============================================================
+    // TRANSLATIONS (13 LANGUAGES)
+    // ============================================================
+    const translations = {
+      en: {
+        subtitle: 'Generate Your Pairing Code', serverSelect: 'Auto Selecting...', serverSelectBtn: 'Change',
+        serverSelectionTitle: '✦ Select a Server ✦', quickSetupTitle: 'Quick Setup',
+        quickSetupDesc: 'Server is auto-selected for best performance. Just enter your WhatsApp number to instantly generate a pairing code!',
+        phoneLabel: 'WhatsApp Number', phoneHint: 'Include country code (e.g., 92 for Pakistan)',
+        generateBtn: 'Generate Pair Code', loadingText: 'Generating your pair code...',
+        codePlaceholder: 'Your pairing code will appear here', copyBtn: 'Copy Code', copiedBtn: 'Copied!',
+        footerText: '© 2026 AHMAD-MD | Powered By ahmadTech', active: 'Active', limit: 'Limit',
+        clickToSelect: 'Click to select', selectServerFirst: 'Please select a server first',
+        clickSelectServer: 'Click on "Select Server" to choose a server', phoneRequired: 'Phone number is required',
+        invalidPhone: 'Invalid phone number format', validPhoneError: 'Please enter a valid phone number',
+        enterPhone: 'Please enter your WhatsApp number', codeSuccess: 'Pair code generated successfully!',
+        errorGenerating: 'Error generating code', failedGenerate: 'Failed to generate code. Please try again.',
+        codeCopied: 'Code copied to clipboard!', copyFailed: 'Failed to copy code', wait: 'Wait', serverName: 'Server',
+        spinLabel: 'Lucky Spin', spinTitle: '🎰 Lucky Spin', spinSub: 'Spin and get a random server!',
+        spinBtn: 'SPIN', spinResult: 'Lucky Server',
+        autoServerLabel: 'Auto New Server', randomServerToast: 'Random server selected!',
+        notifTitle: 'Code Generated!', notifBody: 'Your pairing code is ready',
+        tutorialLabel: 'Learn',
+        guideWelcome: 'Welcome! Let me quickly show you how to use this page step by step.',
+        guideLangTitle: 'Language Selector',
+        guideLangText: 'Tap here to change the language. We support many languages.',
+        guideThemeTitle: 'Theme Colors',
+        guideThemeText: 'Tap here to pick from <strong>50 beautiful colors</strong> or create your own custom color!',
+        guideServerTitle: 'Auto Server',
+        guideServerText: 'Server is <strong>auto-selected</strong> for best performance. Tap "Change" to pick manually.',
+        guideAutoTitle: 'Auto New Server',
+        guideAutoText: 'Tap this button to <strong>randomly pick a new server</strong> every time. Try it!',
+        guidePhoneTitle: 'Enter WhatsApp Number',
+        guidePhoneText: 'Type your WhatsApp number with country code. Example: <strong>9232591xxxxx</strong>',
+        guideBtnTitle: 'Generate Code',
+        guideBtnText: 'Tap this <strong>big button</strong> to generate your pairing code instantly!',
+        guideSkip: 'Skip Tour', guideNext: 'Got it!', guideFinish: 'Finish',
+        guideQuickActionsTitle: 'Quick Actions',
+        guideQuickActionsText: 'Here you can toggle <strong>Light/Dark mode</strong>, <strong>Sound</strong>, view <strong>History</strong>, and manage <strong>Favorites</strong>.',
+        guideHistoryTitle: 'Recent History',
+        guideHistoryText: 'Your last generated codes are saved here for quick access.',
+        shareBtn: 'Share', retryBtn: 'Retry',
+        codeExpires: 'Code expires in', voiceOn: 'Voice On', voiceOff: 'Voice Off',
+        favTitle: 'Favorites', historyTitle: 'Recent History',
+        noFav: 'No favorites yet. Click ⭐ on a server to save.',
+        noHistory: 'No history yet.',
+        voiceAnnounce: 'Your pairing code is ready',
+        shareText: 'Check my WhatsApp pairing code',
+        successRateText: 'Success Rate',
+        serverAddedToFav: 'Server added to favorites!',
+        serverRemovedFromFav: 'Server removed from favorites'
+      },
+      ur_roman: {
+        subtitle: 'Apna Pairing Code Banayein', serverSelect: 'Auto Select Ho Raha...', serverSelectBtn: 'Change Karein',
+        serverSelectionTitle: '✦ Server Select Karein ✦', quickSetupTitle: 'Quick Setup',
+        quickSetupDesc: 'Server best performance ke liye auto select ho jata hai. Apna WhatsApp number daalein aur foran code hasil karein!',
+        phoneLabel: 'WhatsApp Number', phoneHint: 'Country code shamil karein (jaise 92)',
+        generateBtn: 'Pair Code Banayein', loadingText: 'Aap ka pair code ban raha hai...',
+        codePlaceholder: 'Aap ka code yahan zahir hoga', copyBtn: 'Copy Karein', copiedBtn: 'Copy Ho Gaya!',
+        footerText: '© 2026 AHMAD-MD | By ahmadTech', active: 'Active', limit: 'Limit',
+        clickToSelect: 'Select karne ke liye click karein', selectServerFirst: 'Pehle server select karein',
+        clickSelectServer: '"Select Server" par click karein', phoneRequired: 'Phone number zaroori hai',
+        invalidPhone: 'Ghalat format', validPhoneError: 'Sahi phone number daalein',
+        enterPhone: 'Apna WhatsApp number daalein', codeSuccess: 'Code ban gaya!',
+        errorGenerating: 'Kharaabi', failedGenerate: 'Nakaami. Dobara koshish karein.',
+        codeCopied: 'Code copy ho gaya!', copyFailed: 'Copy nahi hua',
+        wait: 'Intezar', serverName: 'Server',
+        spinLabel: 'Lucky Spin', spinTitle: '🎰 Lucky Spin', spinSub: 'Spin karein aur random server paayein!',
+        spinBtn: 'SPIN', spinResult: 'Lucky Server',
+        autoServerLabel: 'Auto Naya Server', randomServerToast: 'Random server select ho gaya!',
+        notifTitle: 'Code Ban Gaya!', notifBody: 'Aap ka code tayyar hai',
+        tutorialLabel: 'Seekhein',
+        guideWelcome: 'Khush aamdeed! Chalein main aap ko step by step samjhata hun.',
+        guideLangTitle: 'Zubaan Select Karein',
+        guideLangText: 'Zubaan badalne ke liye yahan tap karein. Hum kai zubaanein support karte hain.',
+        guideThemeTitle: 'Theme Colors',
+        guideThemeText: 'Yahan tap karein aur <strong>50 khoobsurat colors</strong> mein se chunein ya apna custom color banayein!',
+        guideServerTitle: 'Auto Server',
+        guideServerText: 'Server best performance ke liye <strong>auto select</strong> hota hai. Manually chunne ke liye "Change" dabayein.',
+        guideAutoTitle: 'Auto Naya Server',
+        guideAutoText: 'Yeh button dabayein aur <strong>har bar naya random server</strong> milega. Abhi try karein!',
+        guidePhoneTitle: 'WhatsApp Number Daalein',
+        guidePhoneText: 'Apna WhatsApp number country code ke saath likhein. Misal: <strong>9232591xxxxx</strong>',
+        guideBtnTitle: 'Code Banayein',
+        guideBtnText: 'Apna pairing code foran banane ke liye yeh <strong>bara button</strong> dabayein!',
+        guideSkip: 'Tour Skip Karein', guideNext: 'Samajh Gaya!', guideFinish: 'Mukammal',
+        guideQuickActionsTitle: 'Quick Actions',
+        guideQuickActionsText: 'Yahan aap <strong>Light/Dark mode</strong>, <strong>Sound</strong>, <strong>History</strong>, aur <strong>Favorites</strong> toggle kar sakte hain.',
+        guideHistoryTitle: 'Recent History',
+        guideHistoryText: 'Aap ke pichle codes yahan save hote hain.',
+        shareBtn: 'Share', retryBtn: 'Retry',
+        codeExpires: 'Code khatam hone mein', voiceOn: 'Voice On', voiceOff: 'Voice Off',
+        favTitle: 'Favorites', historyTitle: 'Recent History',
+        noFav: 'Koi favorite nahi. Server pe ⭐ click karein.',
+        noHistory: 'Koi history nahi.',
+        voiceAnnounce: 'Aap ka pairing code tayyar hai',
+        shareText: 'Mera WhatsApp pairing code dekhein',
+        successRateText: 'Success Rate',
+        serverAddedToFav: 'Server favorite mein add ho gaya!',
+        serverRemovedFromFav: 'Server favorite se remove ho gaya'
+      },
+      ur: {
+        subtitle: 'اپنا پیئرنگ کوڈ بنائیں', serverSelect: 'خودکار انتخاب...', serverSelectBtn: 'تبدیل کریں',
+        serverSelectionTitle: '✦ سرور منتخب کریں ✦', quickSetupTitle: 'فوری سیٹ اپ',
+        quickSetupDesc: 'بہترین کارکردگی کے لیے سرور خودکار منتخب ہو جاتا ہے۔ اپنا واٹس ایپ نمبر درج کریں اور فوراً پیئرنگ کوڈ حاصل کریں!',
+        phoneLabel: 'واٹس ایپ نمبر', phoneHint: 'ملکی کوڈ شامل کریں (مثلاً پاکستان کے لیے 92)',
+        generateBtn: 'پیئر کوڈ بنائیں', loadingText: 'آپ کا پیئر کوڈ بنایا جا رہا ہے...',
+        codePlaceholder: 'آپ کا پیئرنگ کوڈ یہاں ظاہر ہوگا', copyBtn: 'کوڈ کاپی کریں', copiedBtn: 'کاپی ہو گیا!',
+        footerText: '© 2026 احمد-MD | طاقت ور بذریعہ ahmadTech', active: 'فعال', limit: 'حد',
+        clickToSelect: 'منتخب کرنے کے لیے کلک کریں', selectServerFirst: 'پہلے سرور منتخب کریں',
+        clickSelectServer: '"سرور منتخب کریں" پر کلک کریں', phoneRequired: 'فون نمبر درکار ہے',
+        invalidPhone: 'غلط فون نمبر فارمیٹ', validPhoneError: 'درست فون نمبر درج کریں',
+        enterPhone: 'اپنا واٹس ایپ نمبر درج کریں', codeSuccess: 'پیئر کوڈ کامیابی سے بن گیا!',
+        errorGenerating: 'کوڈ بنانے میں خرابی', failedGenerate: 'ناکامی۔ دوبارہ کوشش کریں۔',
+        codeCopied: 'کوڈ کاپی ہو گیا!', copyFailed: 'کوڈ کاپی نہیں ہوا',
+        wait: 'انتظار', serverName: 'سرور',
+        spinLabel: 'لکی اسپن', spinTitle: '🎰 لکی اسپن', spinSub: 'اسپن کریں اور رینڈم سرور حاصل کریں!',
+        spinBtn: 'اسپن', spinResult: 'لکی سرور',
+        autoServerLabel: 'خودکار نیا سرور', randomServerToast: 'رینڈم سرور منتخب ہو گیا!',
+        notifTitle: 'کوڈ بن گیا!', notifBody: 'آپ کا پیئرنگ کوڈ تیار ہے',
+        tutorialLabel: 'سیکھیں',
+        guideWelcome: 'خوش آمدید! میں آپ کو مرحلہ وار سمجھاتا ہوں کہ یہ پیج کیسے استعمال کرنا ہے۔',
+        guideLangTitle: 'زبان منتخب کریں',
+        guideLangText: 'زبان تبدیل کرنے کے لیے یہاں دبائیں۔ ہم کئی زبانیں سپورٹ کرتے ہیں۔',
+        guideThemeTitle: 'تھیم رنگ',
+        guideThemeText: 'یہاں دبائیں اور <strong>50 خوبصورت رنگوں</strong> میں سے چنیں یا اپنا کسٹم رنگ بنائیں!',
+        guideServerTitle: 'خودکار سرور',
+        guideServerText: 'بہترین کارکردگی کے لیے سرور <strong>خودکار منتخب</strong> ہوتا ہے۔ دستی طور پر چننے کے لیے "تبدیل کریں" دبائیں۔',
+        guideAutoTitle: 'خودکار نیا سرور',
+        guideAutoText: 'یہ بٹن دبائیں اور <strong>ہر بار نیا رینڈم سرور</strong> منتخب ہوگا۔ ابھی آزمائیں!',
+        guidePhoneTitle: 'واٹس ایپ نمبر درج کریں',
+        guidePhoneText: 'اپنا واٹس ایپ نمبر ملکی کوڈ کے ساتھ لکھیں۔ مثال: <strong>9232591xxxxx</strong>',
+        guideBtnTitle: 'کوڈ بنائیں',
+        guideBtnText: 'اپنا پیئرنگ کوڈ فوراً بنانے کے لیے یہ <strong>بڑا بٹن</strong> دبائیں!',
+        guideSkip: 'ٹور چھوڑیں', guideNext: 'سمجھ گیا!', guideFinish: 'مکمل',
+        guideQuickActionsTitle: 'فوری کام',
+        guideQuickActionsText: 'یہاں آپ <strong>لائٹ/ڈارک موڈ</strong>، <strong>آواز</strong>، <strong>ہسٹری</strong>، اور <strong>پسندیدہ</strong> ٹوگل کر سکتے ہیں۔',
+        guideHistoryTitle: 'حالیہ ہسٹری',
+        guideHistoryText: 'آپ کے پچھلے کوڈز یہاں محفوظ ہوتے ہیں۔',
+        shareBtn: 'شیئر', retryBtn: 'دوبارہ',
+        codeExpires: 'کوڈ ختم ہونے میں', voiceOn: 'آواز آن', voiceOff: 'آواز آف',
+        favTitle: 'پسندیدہ', historyTitle: 'حالیہ ہسٹری',
+        noFav: 'کوئی پسندیدہ نہیں۔ سرور پر ⭐ کلک کریں۔',
+        noHistory: 'کوئی ہسٹری نہیں۔',
+        voiceAnnounce: 'آپ کا پیئرنگ کوڈ تیار ہے',
+        shareText: 'میرا واٹس ایپ پیئرنگ کوڈ دیکھیں',
+        successRateText: 'کامیابی کی شرح',
+        serverAddedToFav: 'سرور پسندیدہ میں شامل ہو گیا!',
+        serverRemovedFromFav: 'سرور پسندیدہ سے ہٹا دیا گیا'
+      },
+      ps: {
+        subtitle: 'خپل پیئرنگ کوډ جوړ کړئ', serverSelect: 'اتوماتیک انتخاب...', serverSelectBtn: 'بدلول',
+        serverSelectionTitle: '✦ سرور وټاکئ ✦', quickSetupTitle: 'چټک تنظیم',
+        quickSetupDesc: 'د غوره فعالیت لپاره سرور په اتوماتیک ډول ټاکل کیږي. یوازې خپل واټس اپ نمبر دننه کړئ او سمدلاسه پیئرنگ کوډ ترلاسه کړئ!',
+        phoneLabel: 'واټس اپ نمبر', phoneHint: 'د هیواد کوډ شامل کړئ (لکه پاکستان لپاره 92)',
+        generateBtn: 'پیئر کوډ جوړ کړئ', loadingText: 'ستاسو پیئر کوډ جوړیږي...',
+        codePlaceholder: 'ستاسو پیئرنگ کوډ به دلته ښکاره شي', copyBtn: 'کوډ کاپي کړئ', copiedBtn: 'کاپي شو!',
+        footerText: '© 2026 احمد-MD | د ahmadTech لخوا', active: 'فعال', limit: 'حد',
+        clickToSelect: 'د ټاکلو لپاره کلیک وکړئ', selectServerFirst: 'لومړی یو سرور وټاکئ',
+        clickSelectServer: 'د سرور د ټاکلو لپاره "سرور وټاکئ" باندې کلیک وکړئ', phoneRequired: 'د تلیفون نمبر اړتیا ده',
+        invalidPhone: 'د تلیفون نمبر غلط بڼه', validPhoneError: 'مهرباني وکړئ سم تلیفون نمبر دننه کړئ',
+        enterPhone: 'مهرباني وکړئ خپل واټس اپ نمبر دننه کړئ', codeSuccess: 'پیئر کوډ په بریالیتوب سره جوړ شو!',
+        errorGenerating: 'د کوډ په جوړولو کې تېروتنه', failedGenerate: 'د کوډ جوړول ناکام شول. بیا هڅه وکړئ.',
+        codeCopied: 'کوډ کاپي شو!', copyFailed: 'کاپي ناکامه شوه',
+        wait: 'انتظار', serverName: 'سرور',
+        spinLabel: 'لکی سپین', spinTitle: '🎰 لکی سپین', spinSub: 'سپین وکړئ او تصادفي سرور ترلاسه کړئ!',
+        spinBtn: 'سپین', spinResult: 'لکی سرور',
+        autoServerLabel: 'اتوماتیک نوی سرور', randomServerToast: 'تصادفي سرور وټاکل شو!',
+        notifTitle: 'کوډ جوړ شو!', notifBody: 'ستاسو پیئرنگ کوډ چمتو دی',
+        tutorialLabel: 'زده کړه',
+        guideWelcome: 'ښه راغلاست! اجازه راکړئ په ګام په ګام ښودنه وکړم چې دا پاڼه څنګه وکاروئ.',
+        guideLangTitle: 'د ژبې ټاکل',
+        guideLangText: 'د ژبې د بدلولو لپاره دلته کلیک وکړئ. موږ ډیری ژبې ملاتړ کوو.',
+        guideThemeTitle: 'د تیم رنګونه',
+        guideThemeText: 'دلته کلیک وکړئ او د <strong>50 ښکلي رنګونو</strong> څخه وټاکئ یا خپل ځانګړی رنګ جوړ کړئ!',
+        guideServerTitle: 'اتوماتیک سرور',
+        guideServerText: 'د غوره فعالیت لپاره سرور <strong>په اتوماتیک ډول ټاکل کیږي</strong>. د لاسي ټاکلو لپاره "بدلول" کلیک وکړئ.',
+        guideAutoTitle: 'اتوماتیک نوی سرور',
+        guideAutoText: 'دا تڼۍ کلیک وکړئ او <strong>هر ځل نوی تصادفي سرور</strong> ترلاسه کړئ. همدا اوس هڅه وکړئ!',
+        guidePhoneTitle: 'واټس اپ نمبر دننه کړئ',
+        guidePhoneText: 'خپل واټس اپ نمبر د هیواد کوډ سره ولیکئ. بېلګه: <strong>9232591xxxxx</strong>',
+        guideBtnTitle: 'کوډ جوړ کړئ',
+        guideBtnText: 'خپل پیئرنگ کوډ سمدلاسه جوړولو لپاره دا <strong>لوی تڼۍ</strong> کلیک وکړئ!',
+        guideSkip: 'سفر پریږدئ', guideNext: 'پوه شوم!', guideFinish: 'پای',
+        guideQuickActionsTitle: 'ژر کارونه',
+        guideQuickActionsText: 'دلته تاسو کولی شئ <strong>رڼا/تیاره حالت</strong>، <strong>غږ</strong>، <strong>تاریخ</strong>، او <strong>خوښې</strong> بدل کړئ.',
+        guideHistoryTitle: 'وروستی تاریخ',
+        guideHistoryText: 'ستاسو پخوانی کوډونه دلته خوندي کیږي.',
+        shareBtn: 'شریکول', retryBtn: 'بیا هڅه',
+        codeExpires: 'کوډ پای ته رسیدل', voiceOn: 'غږ آن', voiceOff: 'غږ آف',
+        favTitle: 'خوښې', historyTitle: 'وروستی تاریخ',
+        noFav: 'هیڅ خوښه نشته. په سرور ⭐ کلیک وکړئ.',
+        noHistory: 'هیڅ تاریخ نشته.',
+        voiceAnnounce: 'ستاسو پیئرنگ کوډ چمتو دی',
+        shareText: 'زما واټس اپ پیئرنگ کوډ وګورئ',
+        successRateText: 'د بریا کچه',
+        serverAddedToFav: 'سرور خوښو ته اضافه شو!',
+        serverRemovedFromFav: 'سرور له خوښو لرې شو'
+      },
+      fa: {
+        subtitle: 'کد جفت‌شدن خود را بسازید', serverSelect: 'انتخاب خودکار...', serverSelectBtn: 'تغییر',
+        serverSelectionTitle: '✦ یک سرور انتخاب کنید ✦', quickSetupTitle: 'راه‌اندازی سریع',
+        quickSetupDesc: 'سرور برای بهترین عملکرد به صورت خودکار انتخاب می‌شود. فقط شماره واتس‌اپ خود را وارد کنید تا فوراً کد جفت‌شدن دریافت کنید!',
+        phoneLabel: 'شماره واتس‌اپ', phoneHint: 'کد کشور را وارد کنید (مثلاً 92 برای پاکستان)',
+        generateBtn: 'ساخت کد جفت‌شدن', loadingText: 'در حال ساخت کد جفت‌شدن شما...',
+        codePlaceholder: 'کد جفت‌شدن شما اینجا نمایش داده می‌شود', copyBtn: 'کپی کد', copiedBtn: 'کپی شد!',
+        footerText: '© 2026 احمد-MD | قدرت گرفته توسط ahmadTech', active: 'فعال', limit: 'محدودیت',
+        clickToSelect: 'برای انتخاب کلیک کنید', selectServerFirst: 'لطفاً ابتدا یک سرور انتخاب کنید',
+        clickSelectServer: 'برای انتخاب سرور روی "انتخاب سرور" کلیک کنید', phoneRequired: 'شماره تلفن الزامی است',
+        invalidPhone: 'قالب شماره تلفن نامعتبر', validPhoneError: 'لطفاً یک شماره تلفن معتبر وارد کنید',
+        enterPhone: 'لطفاً شماره واتس‌اپ خود را وارد کنید', codeSuccess: 'کد جفت‌شدن با موفقیت ساخته شد!',
+        errorGenerating: 'خطا در ساخت کد', failedGenerate: 'ساخت کد ناموفق بود. دوباره تلاش کنید.',
+        codeCopied: 'کد کپی شد!', copyFailed: 'کپی کد ناموفق بود',
+        wait: 'صبر', serverName: 'سرور',
+        spinLabel: 'چرخ شانس', spinTitle: '🎰 چرخ شانس', spinSub: 'بچرخانید و یک سرور تصادفی بگیرید!',
+        spinBtn: 'بچرخان', spinResult: 'سرور شانس',
+        autoServerLabel: 'سرور جدید خودکار', randomServerToast: 'سرور تصادفی انتخاب شد!',
+        notifTitle: 'کد ساخته شد!', notifBody: 'کد جفت‌شدن شما آماده است',
+        tutorialLabel: 'آموزش',
+        guideWelcome: 'خوش آمدید! اجازه دهید به صورت گام به گام نحوه استفاده از این صفحه را نشان دهم.',
+        guideLangTitle: 'انتخاب زبان',
+        guideLangText: 'برای تغییر زبان اینجا ضربه بزنید. ما از زبان‌های زیادی پشتیبانی می‌کنیم.',
+        guideThemeTitle: 'رنگ‌های تم',
+        guideThemeText: 'اینجا ضربه بزنید و از <strong>50 رنگ زیبا</strong> انتخاب کنید یا رنگ سفارشی خود را بسازید!',
+        guideServerTitle: 'سرور خودکار',
+        guideServerText: 'سرور برای بهترین عملکرد <strong>به صورت خودکار انتخاب می‌شود</strong>. برای انتخاب دستی "تغییر" را بزنید.',
+        guideAutoTitle: 'سرور جدید خودکار',
+        guideAutoText: 'این دکمه را بزنید تا <strong>هر بار یک سرور تصادفی جدید</strong> بگیرید. امتحان کنید!',
+        guidePhoneTitle: 'شماره واتس‌اپ را وارد کنید',
+        guidePhoneText: 'شماره واتس‌اپ خود را با کد کشور بنویسید. مثال: <strong>9232591xxxxx</strong>',
+        guideBtnTitle: 'ساخت کد',
+        guideBtnText: 'برای ساخت فوری کد جفت‌شدن این <strong>دکمه بزرگ</strong> را بزنید!',
+        guideSkip: 'رد کردن تور', guideNext: 'متوجه شدم!', guideFinish: 'پایان',
+        guideQuickActionsTitle: 'اقدامات سریع',
+        guideQuickActionsText: 'در اینجا می‌توانید <strong>حالت روشن/تاریک</strong>، <strong>صدا</strong>، <strong>تاریخچه</strong> و <strong>موارد دلخواه</strong> را تغییر دهید.',
+        guideHistoryTitle: 'تاریخچه اخیر',
+        guideHistoryText: 'کدهای قبلی شما در اینجا ذخیره می‌شوند.',
+        shareBtn: 'اشتراک', retryBtn: 'تلاش مجدد',
+        codeExpires: 'کد منقضی می‌شود در', voiceOn: 'صدا روشن', voiceOff: 'صدا خاموش',
+        favTitle: 'موارد دلخواه', historyTitle: 'تاریخچه اخیر',
+        noFav: 'هنوز مورد دلخواهی نیست. روی سرور ⭐ کلیک کنید.',
+        noHistory: 'تاریخچه‌ای نیست.',
+        voiceAnnounce: 'کد جفت‌شدن شما آماده است',
+        shareText: 'کد جفت‌شدن واتس‌اپ من را ببینید',
+        successRateText: 'نرخ موفقیت',
+        serverAddedToFav: 'سرور به موارد دلخواه اضافه شد!',
+        serverRemovedFromFav: 'سرور از موارد دلخواه حذف شد'
+      },
+      hi: {
+        subtitle: 'अपना पेयरिंग कोड बनाएं', serverSelect: 'स्वतः चयन...', serverSelectBtn: 'बदलें',
+        serverSelectionTitle: '✦ सर्वर चुनें ✦', quickSetupTitle: 'त्वरित सेटअप',
+        quickSetupDesc: 'सर्वर सर्वोत्तम प्रदर्शन के लिए स्वतः चयनित होता है। अपना व्हाट्सएप नंबर दर्ज करें और तुरंत पेयरिंग कोड प्राप्त करें!',
+        phoneLabel: 'व्हाट्सएप नंबर', phoneHint: 'देश कोड शामिल करें (जैसे पाकिस्तान के लिए 92)',
+        generateBtn: 'पेयर कोड बनाएं', loadingText: 'आपका पेयर कोड बन रहा है...',
+        codePlaceholder: 'आपका पेयरिंग कोड यहां दिखाई देगा', copyBtn: 'कोड कॉपी करें', copiedBtn: 'कॉपी हो गया!',
+        footerText: '© 2026 अहमद-MD | ahmadTech द्वारा संचालित', active: 'सक्रिय', limit: 'सीमा',
+        clickToSelect: 'चुनने के लिए क्लिक करें', selectServerFirst: 'कृपया पहले एक सर्वर चुनें',
+        clickSelectServer: 'सर्वर चुनने के लिए "सर्वर चुनें" पर क्लिक करें', phoneRequired: 'फोन नंबर आवश्यक है',
+        invalidPhone: 'अमान्य फोन नंबर प्रारूप', validPhoneError: 'कृपया एक वैध फोन नंबर दर्ज करें',
+        enterPhone: 'कृपया अपना व्हाट्सएप नंबर दर्ज करें', codeSuccess: 'पेयर कोड सफलतापूर्वक बन गया!',
+        errorGenerating: 'कोड बनाने में त्रुटि', failedGenerate: 'कोड बनाने में विफल। कृपया पुनः प्रयास करें।',
+        codeCopied: 'कोड कॉपी हो गया!', copyFailed: 'कोड कॉपी नहीं हो सका',
+        wait: 'प्रतीक्षा', serverName: 'सर्वर',
+        spinLabel: 'लकी स्पिन', spinTitle: '🎰 लकी स्पिन', spinSub: 'स्पिन करें और एक रैंडम सर्वर पाएं!',
+        spinBtn: 'स्पिन', spinResult: 'लकी सर्वर',
+        autoServerLabel: 'ऑटो नया सर्वर', randomServerToast: 'रैंडम सर्वर चयनित!',
+        notifTitle: 'कोड बन गया!', notifBody: 'आपका पेयरिंग कोड तैयार है',
+        tutorialLabel: 'सीखें',
+        guideWelcome: 'स्वागत है! मैं आपको चरण-दर-चरण दिखाता हूं कि इस पेज का उपयोग कैसे करें।',
+        guideLangTitle: 'भाषा चयन',
+        guideLangText: 'भाषा बदलने के लिए यहां टैप करें। हम कई भाषाओं का समर्थन करते हैं।',
+        guideThemeTitle: 'थीम रंग',
+        guideThemeText: 'यहां टैप करें और <strong>50 सुंदर रंगों</strong> में से चुनें या अपना कस्टम रंग बनाएं!',
+        guideServerTitle: 'ऑटो सर्वर',
+        guideServerText: 'सर्वर सर्वोत्तम प्रदर्शन के लिए <strong>स्वतः चयनित</strong> होता है। मैन्युअल रूप से चुनने के लिए "बदलें" टैप करें।',
+        guideAutoTitle: 'ऑटो नया सर्वर',
+        guideAutoText: 'इस बटन को टैप करें और <strong>हर बार एक नया रैंडम सर्वर</strong> पाएं। अभी आजमाएं!',
+        guidePhoneTitle: 'व्हाट्सएप नंबर दर्ज करें',
+        guidePhoneText: 'अपना व्हाट्सएप नंबर देश कोड के साथ लिखें। उदाहरण: <strong>9232591xxxxx</strong>',
+        guideBtnTitle: 'कोड बनाएं',
+        guideBtnText: 'अपना पेयरिंग कोड तुरंत बनाने के लिए यह <strong>बड़ा बटन</strong> टैप करें!',
+        guideSkip: 'टूर छोड़ें', guideNext: 'समझ गया!', guideFinish: 'समाप्त',
+        guideQuickActionsTitle: 'त्वरित कार्य',
+        guideQuickActionsText: 'यहां आप <strong>लाइट/डार्क मोड</strong>, <strong>ध्वनि</strong>, <strong>इतिहास</strong>, और <strong>पसंदीदा</strong> टॉगल कर सकते हैं।',
+        guideHistoryTitle: 'हाल का इतिहास',
+        guideHistoryText: 'आपके पिछले कोड यहां सहेजे जाते हैं।',
+        shareBtn: 'शेयर', retryBtn: 'पुनः प्रयास',
+        codeExpires: 'कोड समाप्त होने में', voiceOn: 'आवाज चालू', voiceOff: 'आवाज बंद',
+        favTitle: 'पसंदीदा', historyTitle: 'हाल का इतिहास',
+        noFav: 'अभी कोई पसंदीदा नहीं। सर्वर पर ⭐ क्लिक करें।',
+        noHistory: 'कोई इतिहास नहीं।',
+        voiceAnnounce: 'आपका पेयरिंग कोड तैयार है',
+        shareText: 'मेरा व्हाट्सएप पेयरिंग कोड देखें',
+        successRateText: 'सफलता दर',
+        serverAddedToFav: 'सर्वर पसंदीदा में जोड़ा गया!',
+        serverRemovedFromFav: 'सर्वर पसंदीदा से हटाया गया'
+      },
+      bn: {
+        subtitle: 'আপনার পেয়ারিং কোড তৈরি করুন', serverSelect: 'স্বয়ংক্রিয় নির্বাচন...', serverSelectBtn: 'পরিবর্তন করুন',
+        serverSelectionTitle: '✦ একটি সার্ভার নির্বাচন করুন ✦', quickSetupTitle: 'দ্রুত সেটআপ',
+        quickSetupDesc: 'সর্বোত্তম কর্মক্ষমতার জন্য সার্ভার স্বয়ংক্রিয়ভাবে নির্বাচিত হয়। আপনার হোয়াটসঅ্যাপ নম্বর লিখুন এবং তৎক্ষণাৎ পেয়ারিং কোড পান!',
+        phoneLabel: 'হোয়াটসঅ্যাপ নম্বর', phoneHint: 'দেশের কোড অন্তর্ভুক্ত করুন (যেমন পাকিস্তানের জন্য 92)',
+        generateBtn: 'পেয়ার কোড তৈরি করুন', loadingText: 'আপনার পেয়ার কোড তৈরি হচ্ছে...',
+        codePlaceholder: 'আপনার পেয়ারিং কোড এখানে প্রদর্শিত হবে', copyBtn: 'কোড কপি করুন', copiedBtn: 'কপি হয়েছে!',
+        footerText: '© 2026 আহমাদ-MD | ahmadTech দ্বারা পরিচালিত', active: 'সক্রিয়', limit: 'সীমা',
+        clickToSelect: 'নির্বাচন করতে ক্লিক করুন', selectServerFirst: 'অনুগ্রহ করে প্রথমে একটি সার্ভার নির্বাচন করুন',
+        clickSelectServer: 'সার্ভার নির্বাচন করতে "সার্ভার নির্বাচন করুন" ক্লিক করুন', phoneRequired: 'ফোন নম্বর প্রয়োজন',
+        invalidPhone: 'অবৈধ ফোন নম্বর ফরম্যাট', validPhoneError: 'অনুগ্রহ করে একটি বৈধ ফোন নম্বর লিখুন',
+        enterPhone: 'অনুগ্রহ করে আপনার হোয়াটসঅ্যাপ নম্বর লিখুন', codeSuccess: 'পেয়ার কোড সফলভাবে তৈরি হয়েছে!',
+        errorGenerating: 'কোড তৈরিতে ত্রুটি', failedGenerate: 'কোড তৈরি ব্যর্থ। আবার চেষ্টা করুন।',
+        codeCopied: 'কোড কপি হয়েছে!', copyFailed: 'কোড কপি ব্যর্থ',
+        wait: 'অপেক্ষা', serverName: 'সার্ভার',
+        spinLabel: 'ভাগ্য স্পিন', spinTitle: '🎰 ভাগ্য স্পিন', spinSub: 'স্পিন করুন এবং একটি র্যান্ডম সার্ভার পান!',
+        spinBtn: 'স্পিন', spinResult: 'ভাগ্য সার্ভার',
+        autoServerLabel: 'স্বয়ংক্রিয় নতুন সার্ভার', randomServerToast: 'র্যান্ডম সার্ভার নির্বাচিত!',
+        notifTitle: 'কোড তৈরি হয়েছে!', notifBody: 'আপনার পেয়ারিং কোড প্রস্তুত',
+        tutorialLabel: 'শিখুন',
+        guideWelcome: 'স্বাগতম! আমি আপনাকে ধাপে ধাপে দেখাই কিভাবে এই পেজ ব্যবহার করবেন।',
+        guideLangTitle: 'ভাষা নির্বাচন',
+        guideLangText: 'ভাষা পরিবর্তন করতে এখানে ট্যাপ করুন। আমরা অনেক ভাষা সমর্থন করি।',
+        guideThemeTitle: 'থিম রঙ',
+        guideThemeText: 'এখানে ট্যাপ করুন এবং <strong>50টি সুন্দর রঙ</strong> থেকে চয়ন করুন বা আপনার নিজস্ব কাস্টম রঙ তৈরি করুন!',
+        guideServerTitle: 'স্বয়ংক্রিয় সার্ভার',
+        guideServerText: 'সর্বোত্তম কর্মক্ষমতার জন্য সার্ভার <strong>স্বয়ংক্রিয়ভাবে নির্বাচিত</strong> হয়। ম্যানুয়ালি নির্বাচন করতে "পরিবর্তন করুন" ট্যাপ করুন।',
+        guideAutoTitle: 'স্বয়ংক্রিয় নতুন সার্ভার',
+        guideAutoText: 'এই বোতামটি ট্যাপ করুন এবং <strong>প্রতিবার একটি নতুন র্যান্ডম সার্ভার</strong> পান। এখনই চেষ্টা করুন!',
+        guidePhoneTitle: 'হোয়াটসঅ্যাপ নম্বর লিখুন',
+        guidePhoneText: 'আপনার হোয়াটসঅ্যাপ নম্বর দেশের কোড সহ লিখুন। উদাহরণ: <strong>9232591xxxxx</strong>',
+        guideBtnTitle: 'কোড তৈরি করুন',
+        guideBtnText: 'আপনার পেয়ারিং কোড তৎক্ষণাৎ তৈরি করতে এই <strong>বড় বোতামটি</strong> ট্যাপ করুন!',
+        guideSkip: 'ট্যুর এড়িয়ে যান', guideNext: 'বুঝেছি!', guideFinish: 'সমাপ্ত',
+        guideQuickActionsTitle: 'দ্রুত কাজ',
+        guideQuickActionsText: 'এখানে আপনি <strong>লাইট/ডার্ক মোড</strong>, <strong>শব্দ</strong>, <strong>ইতিহাস</strong>, এবং <strong>প্রিয়</strong> টগল করতে পারেন।',
+        guideHistoryTitle: 'সাম্প্রতিক ইতিহাস',
+        guideHistoryText: 'আপনার পূর্ববর্তী কোডগুলি এখানে সংরক্ষিত হয়।',
+        shareBtn: 'শেয়ার', retryBtn: 'পুনরায় চেষ্টা',
+        codeExpires: 'কোড শেষ হবে', voiceOn: 'শব্দ চালু', voiceOff: 'শব্দ বন্ধ',
+        favTitle: 'প্রিয়', historyTitle: 'সাম্প্রতিক ইতিহাস',
+        noFav: 'এখনও কোনও প্রিয় নেই। সার্ভারে ⭐ ক্লিক করুন।',
+        noHistory: 'কোনও ইতিহাস নেই।',
+        voiceAnnounce: 'আপনার পেয়ারিং কোড প্রস্তুত',
+        shareText: 'আমার হোয়াটসঅ্যাপ পেয়ারিং কোড দেখুন',
+        successRateText: 'সফলতার হার',
+        serverAddedToFav: 'সার্ভার প্রিয়তে যোগ করা হয়েছে!',
+        serverRemovedFromFav: 'সার্ভার প্রিয় থেকে সরানো হয়েছে'
+      },
+      sw: {
+        subtitle: 'Tengeneza Msimbo wako wa Kuunganisha', serverSelect: 'Inachagua kiotomatiki...', serverSelectBtn: 'Badilisha',
+        serverSelectionTitle: '✦ Chagua Seva ✦', quickSetupTitle: 'Usanidi wa Haraka',
+        quickSetupDesc: 'Seva inachaguliwa kiotomatiki kwa utendaji bora. Ingiza namba yako ya WhatsApp na upate msimbo wa kuunganisha mara moja!',
+        phoneLabel: 'Namba ya WhatsApp', phoneHint: 'Jumuisha msimbo wa nchi (k.m. 92 kwa Pakistan)',
+        generateBtn: 'Tengeneza Msimbo', loadingText: 'Inatengeneza msimbo wako...',
+        codePlaceholder: 'Msimbo wako utaonekana hapa', copyBtn: 'Nakili Msimbo', copiedBtn: 'Imenakiliwa!',
+        footerText: '© 2026 AHMAD-MD | Inaendeshwa na ahmadTech', active: 'Hai', limit: 'Kikomo',
+        clickToSelect: 'Bofya kuchagua', selectServerFirst: 'Tafadhali chagua seva kwanza',
+        clickSelectServer: 'Bofya "Chagua Seva" kuchagua seva', phoneRequired: 'Namba ya simu inahitajika',
+        invalidPhone: 'Muundo wa namba si sahihi', validPhoneError: 'Tafadhali ingiza namba sahihi ya simu',
+        enterPhone: 'Tafadhali ingiza namba yako ya WhatsApp', codeSuccess: 'Msimbo umeundwa kwa mafanikio!',
+        errorGenerating: 'Hitilafu katika kutengeneza msimbo', failedGenerate: 'Imeshindwa kutengeneza msimbo. Jaribu tena.',
+        codeCopied: 'Msimbo umenakiliwa!', copyFailed: 'Imeshindwa kunakili msimbo',
+        wait: 'Subiri', serverName: 'Seva',
+        spinLabel: 'Mzunguko wa Bahati', spinTitle: '🎰 Mzunguko wa Bahati', spinSub: 'Zungusha na upate seva ya nasibu!',
+        spinBtn: 'ZUNGUSHA', spinResult: 'Seva ya Bahati',
+        autoServerLabel: 'Seva Mpya Kiotomatiki', randomServerToast: 'Seva ya nasibu imechaguliwa!',
+        notifTitle: 'Msimbo Umeundwa!', notifBody: 'Msimbo wako uko tayari',
+        tutorialLabel: 'Jifunze',
+        guideWelcome: 'Karibu! Ngoja nikuonyeshe hatua kwa hatua jinsi ya kutumia ukurasa huu.',
+        guideLangTitle: 'Kichagua Lugha',
+        guideLangText: 'Gusa hapa kubadilisha lugha. Tunasaidia lugha nyingi.',
+        guideThemeTitle: 'Rangi za Mandhari',
+        guideThemeText: 'Gusa hapa kuchagua kutoka <strong>rangi 50 nzuri</strong> au tengeneza rangi yako mwenyewe!',
+        guideServerTitle: 'Seva Kiotomatiki',
+        guideServerText: 'Seva <strong>inachaguliwa kiotomatiki</strong> kwa utendaji bora. Gusa "Badilisha" kuchagua mwenyewe.',
+        guideAutoTitle: 'Seva Mpya Kiotomatiki',
+        guideAutoText: 'Gusa kitufe hiki <strong>kuchagua seva mpya ya nasibu</strong> kila wakati. Jaribu!',
+        guidePhoneTitle: 'Ingiza Namba ya WhatsApp',
+        guidePhoneText: 'Andika namba yako ya WhatsApp na msimbo wa nchi. Mfano: <strong>9232591xxxxx</strong>',
+        guideBtnTitle: 'Tengeneza Msimbo',
+        guideBtnText: 'Gusa <strong>kitufe hiki kikubwa</strong> kutengeneza msimbo wako mara moja!',
+        guideSkip: 'Ruka Ziara', guideNext: 'Nimeelewa!', guideFinish: 'Maliza',
+        guideQuickActionsTitle: 'Vitendo vya Haraka',
+        guideQuickActionsText: 'Hapa unaweza kubadilisha <strong>Hali ya Mwanga/Giza</strong>, <strong>Sauti</strong>, <strong>Historia</strong>, na <strong>Vipendwa</strong>.',
+        guideHistoryTitle: 'Historia ya Hivi Karibuni',
+        guideHistoryText: 'Msimbo wako wa awali umehifadhiwa hapa.',
+        shareBtn: 'Shiriki', retryBtn: 'Jaribu Tena',
+        codeExpires: 'Msimbo unaisha kwa', voiceOn: 'Sauti Imewaka', voiceOff: 'Sauti Imezimwa',
+        favTitle: 'Vipendwa', historyTitle: 'Historia ya Hivi Karibuni',
+        noFav: 'Hakuna vipendwa bado. Bofya ⭐ kwenye seva.',
+        noHistory: 'Hakuna historia bado.',
+        voiceAnnounce: 'Msimbo wako wa kuunganisha uko tayari',
+        shareText: 'Angalia msimbo wangu wa WhatsApp',
+        successRateText: 'Kiwango cha Mafanikio',
+        serverAddedToFav: 'Seva imeongezwa kwa vipendwa!',
+        serverRemovedFromFav: 'Seva imeondolewa kwenye vipendwa'
+      },
+      ht: {
+        subtitle: 'Jenere Kòd Pèman w ou', serverSelect: 'Ap Chwazi Otomatik...', serverSelectBtn: 'Chanje',
+        serverSelectionTitle: '✦ Chwazi yon Sèvè ✦', quickSetupTitle: 'Konfigirasyon Rapid',
+        quickSetupDesc: 'Sèvè a chwazi otomatikman pou pi bon pèfòmans. Jis antre nimewo WhatsApp ou pou jwenn kòd pèman an imedyatman!',
+        phoneLabel: 'Nimewo WhatsApp', phoneHint: 'Enkli kòd peyi a (pa egzanp 92 pou Pakistan)',
+        generateBtn: 'Jenere Kòd Pèman', loadingText: 'N ap jenere kòd pèman w...',
+        codePlaceholder: 'Kòd pèman w ap parèt la', copyBtn: 'Kopye Kòd', copiedBtn: 'Kopye!',
+        footerText: '© 2026 AHMAD-MD | Patrone pa ahmadTech', active: 'Aktif', limit: 'Limit',
+        clickToSelect: 'Klike pou chwazi', selectServerFirst: 'Tanpri chwazi yon sèvè anvan',
+        clickSelectServer: 'Klike sou "Chwazi Sèvè" pou chwazi yon sèvè', phoneRequired: 'Nimewo telefòn obligatwa',
+        invalidPhone: 'Fòma nimewo telefòn pa valid', validPhoneError: 'Tanpri antre yon nimewo telefòn valid',
+        enterPhone: 'Tanpri antre nimewo WhatsApp ou', codeSuccess: 'Kòd pèman jenere avèk siksè!',
+        errorGenerating: 'Erè nan jenere kòd', failedGenerate: 'Pa t kapab jenere kòd. Tanpri eseye ankò.',
+        codeCopied: 'Kòd kopye nan clipboard!', copyFailed: 'Pa t kapab kopye kòd',
+        wait: 'Tann', serverName: 'Sèvè',
+        spinLabel: 'Woulo Chans', spinTitle: '🎰 Woulo Chans', spinSub: 'Vire epi jwenn yon sèvè o aza!',
+        spinBtn: 'VIRE', spinResult: 'Sèvè Chans',
+        autoServerLabel: 'Nouvo Sèvè Otomatik', randomServerToast: 'Sèvè o aza chwazi!',
+        notifTitle: 'Kòd Jenere!', notifBody: 'Kòd pèman w pare',
+        tutorialLabel: 'Aprann',
+        guideWelcome: 'Byenveni! Kite m montre w etap pa etap kijan pou w itilize paj sa a.',
+        guideLangTitle: 'Seleksyonè Lang',
+        guideLangText: 'Tape la pou chanje lang lan. Nou sipòte anpil lang.',
+        guideThemeTitle: 'Koulè Tèm',
+        guideThemeText: 'Tape la pou chwazi pami <strong>50 koulè bèl</strong> oswa kreye pwòp koulè pa w!',
+        guideServerTitle: 'Sèvè Otomatik',
+        guideServerText: 'Sèvè a <strong>chwazi otomatikman</strong> pou pi bon pèfòmans. Tape "Chanje" pou chwazi manyèlman.',
+        guideAutoTitle: 'Nouvo Sèvè Otomatik',
+        guideAutoText: 'Tape bouton sa a pou <strong>chwazi yon nouvo sèvè o aza</strong> chak fwa. Eseye l!',
+        guidePhoneTitle: 'Antre Nimewo WhatsApp',
+        guidePhoneText: 'Tape nimewo WhatsApp ou ak kòd peyi a. Egzanp: <strong>9232591xxxxx</strong>',
+        guideBtnTitle: 'Jenere Kòd',
+        guideBtnText: 'Tape <strong>gwo bouton sa a</strong> pou jenere kòd pèman w imedyatman!',
+        guideSkip: 'Sote Vizit', guideNext: 'Konprann!', guideFinish: 'Fini',
+        guideQuickActionsTitle: 'Aksyon Rapid',
+        guideQuickActionsText: 'Isit la ou ka chanje <strong>Mòd Klè/Fènwa</strong>, <strong>Son</strong>, <strong>Istwa</strong>, ak <strong>Favori</strong>.',
+        guideHistoryTitle: 'Istwa Resan',
+        guideHistoryText: 'Kòd anvan ou yo sove isit la.',
+        shareBtn: 'Pataje', retryBtn: 'Eseye Ankò',
+        codeExpires: 'Kòd ekspire nan', voiceOn: 'Son Sou', voiceOff: 'Son Koupe',
+        favTitle: 'Favori', historyTitle: 'Istwa Resan',
+        noFav: 'Pa gen favori ankò. Klike ⭐ sou yon sèvè.',
+        noHistory: 'Pa gen istwa ankò.',
+        voiceAnnounce: 'Kòd pèman w pare',
+        shareText: 'Gade kòd WhatsApp mwen',
+        successRateText: 'To Siksè',
+        serverAddedToFav: 'Sèvè ajoute nan favori!',
+        serverRemovedFromFav: 'Sèvè retire nan favori'
+      },
+      ar_ma: {
+        subtitle: 'توليد رمز الاقتران الخاص بك', serverSelect: 'الاختيار التلقائي...', serverSelectBtn: 'تغيير',
+        serverSelectionTitle: '✦ اختر خادمًا ✦', quickSetupTitle: 'إعداد سريع',
+        quickSetupDesc: 'يتم اختيار الخادم تلقائيًا للحصول على أفضل أداء. فقط أدخل رقم واتساب الخاص بك للحصول على رمز الاقتران فورًا!',
+        phoneLabel: 'رقم واتساب', phoneHint: 'أدخل رمز الدولة (مثال: 92 لباكستان)',
+        generateBtn: 'إنشاء رمز الاقتران', loadingText: 'جاري إنشاء رمز الاقتران...',
+        codePlaceholder: 'سيظهر رمز الاقتران الخاص بك هنا', copyBtn: 'نسخ الرمز', copiedBtn: 'تم النسخ!',
+        footerText: '© 2026 AHMAD-MD | مدعوم من ahmadTech', active: 'نشط', limit: 'الحد',
+        clickToSelect: 'انقر للاختيار', selectServerFirst: 'الرجاء اختيار خادم أولاً',
+        clickSelectServer: 'انقر على "اختيار خادم" لاختيار خادم', phoneRequired: 'رقم الهاتف مطلوب',
+        invalidPhone: 'تنسيق رقم الهاتف غير صالح', validPhoneError: 'الرجاء إدخال رقم هاتف صالح',
+        enterPhone: 'الرجاء إدخال رقم واتساب الخاص بك', codeSuccess: 'تم إنشاء رمز الاقتران بنجاح!',
+        errorGenerating: 'خطأ في إنشاء الرمز', failedGenerate: 'فشل إنشاء الرمز. حاول مرة أخرى.',
+        codeCopied: 'تم نسخ الرمز إلى الحافظة!', copyFailed: 'فشل نسخ الرمز',
+        wait: 'انتظر', serverName: 'خادم',
+        spinLabel: 'دوران الحظ', spinTitle: '🎰 دوران الحظ', spinSub: 'قم بالدوران واحصل على خادم عشوائي!',
+        spinBtn: 'دوران', spinResult: 'خادم الحظ',
+        autoServerLabel: 'خادم جديد تلقائي', randomServerToast: 'تم اختيار خادم عشوائي!',
+        notifTitle: 'تم إنشاء الرمز!', notifBody: 'رمز الاقتران الخاص بك جاهز',
+        tutorialLabel: 'تعلم',
+        guideWelcome: 'مرحبًا! دعني أريك خطوة بخطوة كيفية استخدام هذه الصفحة.',
+        guideLangTitle: 'اختيار اللغة',
+        guideLangText: 'اضغط هنا لتغيير اللغة. نحن ندعم العديد من اللغات.',
+        guideThemeTitle: 'ألوان الثيم',
+        guideThemeText: 'اضغط هنا للاختيار من بين <strong>50 لونًا جميلاً</strong> أو أنشئ لونك المخصص!',
+        guideServerTitle: 'خادم تلقائي',
+        guideServerText: 'يتم <strong>اختيار الخادم تلقائيًا</strong> للحصول على أفضل أداء. اضغط "تغيير" للاختيار يدويًا.',
+        guideAutoTitle: 'خادم جديد تلقائي',
+        guideAutoText: 'اضغط على هذا الزر <strong>لاختيار خادم عشوائي جديد</strong> في كل مرة. جربه!',
+        guidePhoneTitle: 'أدخل رقم واتساب',
+        guidePhoneText: 'اكتب رقم واتساب الخاص بك مع رمز الدولة. مثال: <strong>9232591xxxxx</strong>',
+        guideBtnTitle: 'إنشاء الرمز',
+        guideBtnText: 'اضغط على هذا <strong>الزر الكبير</strong> لإنشاء رمز الاقتران الخاص بك فورًا!',
+        guideSkip: 'تخطي الجولة', guideNext: 'فهمت!', guideFinish: 'إنهاء',
+        guideQuickActionsTitle: 'إجراءات سريعة',
+        guideQuickActionsText: 'هنا يمكنك تبديل <strong>الوضع الفاتح/الداكن</strong>، <strong>الصوت</strong>، <strong>السجل</strong>، و <strong>المفضلة</strong>.',
+        guideHistoryTitle: 'السجل الأخير',
+        guideHistoryText: 'يتم حفظ رموزك السابقة هنا.',
+        shareBtn: 'مشاركة', retryBtn: 'إعادة المحاولة',
+        codeExpires: 'ينتهي الرمز في', voiceOn: 'الصوت مفعل', voiceOff: 'الصوت معطل',
+        favTitle: 'المفضلة', historyTitle: 'السجل الأخير',
+        noFav: 'لا توجد مفضلات بعد. انقر على ⭐ على خادم.',
+        noHistory: 'لا يوجد سجل بعد.',
+        voiceAnnounce: 'رمز الاقتران الخاص بك جاهز',
+        shareText: 'تحقق من رمز واتساب الخاص بي',
+        successRateText: 'معدل النجاح',
+        serverAddedToFav: 'تمت إضافة الخادم إلى المفضلة!',
+        serverRemovedFromFav: 'تمت إزالة الخادم من المفضلة'
+      },
+      sw_ug: {
+        subtitle: 'Tengeneza Kodi yako ya Kuunganisha', serverSelect: 'Inachagua kiotomatiki...', serverSelectBtn: 'Badilisha',
+        serverSelectionTitle: '✦ Chagua Seva ✦', quickSetupTitle: 'Usanidi wa Haraka',
+        quickSetupDesc: 'Seva inachaguliwa kiotomatiki kwa utendaji bora. Ingiza namba yako ya WhatsApp na upate kodi ya kuunganisha mara moja!',
+        phoneLabel: 'Namba ya WhatsApp', phoneHint: 'Jumuisha kodi ya nchi (k.m. 256 kwa Uganda)',
+        generateBtn: 'Tengeneza Kodi', loadingText: 'Inatengeneza kodi yako...',
+        codePlaceholder: 'Kodi yako itaonekana hapa', copyBtn: 'Nakili Kodi', copiedBtn: 'Imenakiliwa!',
+        footerText: '© 2026 AHMAD-MD | Inaendeshwa na ahmadTech', active: 'Hai', limit: 'Kikomo',
+        clickToSelect: 'Bofya kuchagua', selectServerFirst: 'Tafadhali chagua seva kwanza',
+        clickSelectServer: 'Bofya "Chagua Seva" kuchagua seva', phoneRequired: 'Namba ya simu inahitajika',
+        invalidPhone: 'Muundo wa namba si sahihi', validPhoneError: 'Tafadhali ingiza namba sahihi ya simu',
+        enterPhone: 'Tafadhali ingiza namba yako ya WhatsApp', codeSuccess: 'Kodi imeundwa kwa mafanikio!',
+        errorGenerating: 'Hitilafu katika kutengeneza kodi', failedGenerate: 'Imeshindwa kutengeneza kodi. Jaribu tena.',
+        codeCopied: 'Kodi imenakiliwa!', copyFailed: 'Imeshindwa kunakili kodi',
+        wait: 'Subiri', serverName: 'Seva',
+        spinLabel: 'Mzunguko wa Bahati', spinTitle: '🎰 Mzunguko wa Bahati', spinSub: 'Zungusha na upate seva ya nasibu!',
+        spinBtn: 'ZUNGUSHA', spinResult: 'Seva ya Bahati',
+        autoServerLabel: 'Seva Mpya Kiotomatiki', randomServerToast: 'Seva ya nasibu imechaguliwa!',
+        notifTitle: 'Kodi Imeundwa!', notifBody: 'Kodi yako iko tayari',
+        tutorialLabel: 'Jifunze',
+        guideWelcome: 'Karibu! Ngoja nikuonyeshe hatua kwa hatua jinsi ya kutumia ukurasa huu.',
+        guideLangTitle: 'Kichagua Lugha',
+        guideLangText: 'Gusa hapa kubadilisha lugha. Tunasaidia lugha nyingi.',
+        guideThemeTitle: 'Rangi za Mandhari',
+        guideThemeText: 'Gusa hapa kuchagua kutoka <strong>rangi 50 nzuri</strong> au tengeneza rangi yako mwenyewe!',
+        guideServerTitle: 'Seva Kiotomatiki',
+        guideServerText: 'Seva <strong>inachaguliwa kiotomatiki</strong> kwa utendaji bora. Gusa "Badilisha" kuchagua mwenyewe.',
+        guideAutoTitle: 'Seva Mpya Kiotomatiki',
+        guideAutoText: 'Gusa kitufe hiki <strong>kuchagua seva mpya ya nasibu</strong> kila wakati. Jaribu!',
+        guidePhoneTitle: 'Ingiza Namba ya WhatsApp',
+        guidePhoneText: 'Andika namba yako ya WhatsApp na kodi ya nchi. Mfano: <strong>2567xxxxxxxx</strong>',
+        guideBtnTitle: 'Tengeneza Kodi',
+        guideBtnText: 'Gusa <strong>kitufe hiki kikubwa</strong> kutengeneza kodi yako mara moja!',
+        guideSkip: 'Ruka Ziara', guideNext: 'Nimeelewa!', guideFinish: 'Maliza',
+        guideQuickActionsTitle: 'Vitendo vya Haraka',
+        guideQuickActionsText: 'Hapa unaweza kubadilisha <strong>Hali ya Mwanga/Giza</strong>, <strong>Sauti</strong>, <strong>Historia</strong>, na <strong>Vipendwa</strong>.',
+        guideHistoryTitle: 'Historia ya Hivi Karibuni',
+        guideHistoryText: 'Kodi yako ya awali imehifadhiwa hapa.',
+        shareBtn: 'Shiriki', retryBtn: 'Jaribu Tena',
+        codeExpires: 'Kodi inaisha kwa', voiceOn: 'Sauti Imewaka', voiceOff: 'Sauti Imezimwa',
+        favTitle: 'Vipendwa', historyTitle: 'Historia ya Hivi Karibuni',
+        noFav: 'Hakuna vipendwa bado. Bofya ⭐ kwenye seva.',
+        noHistory: 'Hakuna historia bado.',
+        voiceAnnounce: 'Kodi yako ya kuunganisha iko tayari',
+        shareText: 'Angalia kodi yangu ya WhatsApp',
+        successRateText: 'Kiwango cha Mafanikio',
+        serverAddedToFav: 'Seva imeongezwa kwa vipendwa!',
+        serverRemovedFromFav: 'Seva imeondolewa kwenye vipendwa'
+      },
+      ar_sa: {
+        subtitle: 'توليد رمز الاقتران الخاص بك', serverSelect: 'الاختيار التلقائي...', serverSelectBtn: 'تغيير',
+        serverSelectionTitle: '✦ اختر خادمًا ✦', quickSetupTitle: 'إعداد سريع',
+        quickSetupDesc: 'يتم اختيار الخادم تلقائيًا للحصول على أفضل أداء. فقط أدخل رقم واتساب الخاص بك للحصول على رمز الاقتران فورًا!',
+        phoneLabel: 'رقم واتساب', phoneHint: 'أدخل رمز الدولة (مثال: 966 للسعودية)',
+        generateBtn: 'إنشاء رمز الاقتران', loadingText: 'جاري إنشاء رمز الاقتران...',
+        codePlaceholder: 'سيظهر رمز الاقتران الخاص بك هنا', copyBtn: 'نسخ الرمز', copiedBtn: 'تم النسخ!',
+        footerText: '© 2026 AHMAD-MD | مدعوم من ahmadTech', active: 'نشط', limit: 'الحد',
+        clickToSelect: 'انقر للاختيار', selectServerFirst: 'الرجاء اختيار خادم أولاً',
+        clickSelectServer: 'انقر على "اختيار خادم" لاختيار خادم', phoneRequired: 'رقم الهاتف مطلوب',
+        invalidPhone: 'تنسيق رقم الهاتف غير صالح', validPhoneError: 'الرجاء إدخال رقم هاتف صالح',
+        enterPhone: 'الرجاء إدخال رقم واتساب الخاص بك', codeSuccess: 'تم إنشاء رمز الاقتران بنجاح!',
+        errorGenerating: 'خطأ في إنشاء الرمز', failedGenerate: 'فشل إنشاء الرمز. حاول مرة أخرى.',
+        codeCopied: 'تم نسخ الرمز إلى الحافظة!', copyFailed: 'فشل نسخ الرمز',
+        wait: 'انتظر', serverName: 'خادم',
+        spinLabel: 'دوران الحظ', spinTitle: '🎰 دوران الحظ', spinSub: 'قم بالدوران واحصل على خادم عشوائي!',
+        spinBtn: 'دوران', spinResult: 'خادم الحظ',
+        autoServerLabel: 'خادم جديد تلقائي', randomServerToast: 'تم اختيار خادم عشوائي!',
+        notifTitle: 'تم إنشاء الرمز!', notifBody: 'رمز الاقتران الخاص بك جاهز',
+        tutorialLabel: 'تعلم',
+        guideWelcome: 'مرحبًا! دعني أريك خطوة بخطوة كيفية استخدام هذه الصفحة.',
+        guideLangTitle: 'اختيار اللغة',
+        guideLangText: 'اضغط هنا لتغيير اللغة. نحن ندعم العديد من اللغات.',
+        guideThemeTitle: 'ألوان الثيم',
+        guideThemeText: 'اضغط هنا للاختيار من بين <strong>50 لونًا جميلاً</strong> أو أنشئ لونك المخصص!',
+        guideServerTitle: 'خادم تلقائي',
+        guideServerText: 'يتم <strong>اختيار الخادم تلقائيًا</strong> للحصول على أفضل أداء. اضغط "تغيير" للاختيار يدويًا.',
+        guideAutoTitle: 'خادم جديد تلقائي',
+        guideAutoText: 'اضغط على هذا الزر <strong>لاختيار خادم عشوائي جديد</strong> في كل مرة. جربه!',
+        guidePhoneTitle: 'أدخل رقم واتساب',
+        guidePhoneText: 'اكتب رقم واتساب الخاص بك مع رمز الدولة. مثال: <strong>9232591xxxxx</strong>',
+        guideBtnTitle: 'إنشاء الرمز',
+        guideBtnText: 'اضغط على هذا <strong>الزر الكبير</strong> لإنشاء رمز الاقتران الخاص بك فورًا!',
+        guideSkip: 'تخطي الجولة', guideNext: 'فهمت!', guideFinish: 'إنهاء',
+        guideQuickActionsTitle: 'إجراءات سريعة',
+        guideQuickActionsText: 'هنا يمكنك تبديل <strong>الوضع الفاتح/الداكن</strong>، <strong>الصوت</strong>، <strong>السجل</strong>، و <strong>المفضلة</strong>.',
+        guideHistoryTitle: 'السجل الأخير',
+        guideHistoryText: 'يتم حفظ رموزك السابقة هنا.',
+        shareBtn: 'مشاركة', retryBtn: 'إعادة المحاولة',
+        codeExpires: 'ينتهي الرمز في', voiceOn: 'الصوت مفعل', voiceOff: 'الصوت معطل',
+        favTitle: 'المفضلة', historyTitle: 'السجل الأخير',
+        noFav: 'لا توجد مفضلات بعد. انقر على ⭐ على خادم.',
+        noHistory: 'لا يوجد سجل بعد.',
+        voiceAnnounce: 'رمز الاقتران الخاص بك جاهز',
+        shareText: 'تحقق من رمز واتساب الخاص بي',
+        successRateText: 'معدل النجاح',
+        serverAddedToFav: 'تمت إضافة الخادم إلى المفضلة!',
+        serverRemovedFromFav: 'تمت إزالة الخادم من المفضلة'
+      },
+      ha_ng: {
+        subtitle: 'Ƙirƙiri Lambar Haɗin ku', serverSelect: 'Zaɓin atomatik...', serverSelectBtn: 'Canza',
+        serverSelectionTitle: '✦ Zaɓi Uwar Garke ✦', quickSetupTitle: 'Saiti Mai Sauri',
+        quickSetupDesc: 'Ana zaɓar uwar garke ta atomatik don mafi kyawun aiki. Kawai shigar da lambar WhatsApp ɗinka don samun lambar haɗi nan take!',
+        phoneLabel: 'Lambar WhatsApp', phoneHint: 'Haɗa lambar ƙasa (misali 234 don Najeriya)',
+        generateBtn: 'Ƙirƙiri Lambar Haɗi', loadingText: 'Ana ƙirƙirar lambar haɗinka...',
+        codePlaceholder: 'Lambar haɗinka za ta bayyana a nan', copyBtn: 'Kwafi Lambar', copiedBtn: 'An Kwafa!',
+        footerText: '© 2026 AHMAD-MD | Ƙarfin ahmadTech', active: 'Aiki', limit: 'Iyaka',
+        clickToSelect: 'Danna don zaɓa', selectServerFirst: 'Da fatan zaɓi uwar garke da farko',
+        clickSelectServer: 'Danna "Zaɓi Uwar Garke" don zaɓar uwar garke', phoneRequired: 'Ana buƙatar lambar waya',
+        invalidPhone: 'Tsarin lambar waya ba daidai ba', validPhoneError: 'Da fatan shigar da ingantacciyar lambar waya',
+        enterPhone: 'Da fatan shigar da lambar WhatsApp ɗinka', codeSuccess: 'An ƙirƙiri lambar haɗi cikin nasara!',
+        errorGenerating: 'Kuskure wajen ƙirƙirar lambar', failedGenerate: 'An kasa ƙirƙirar lambar. Sake gwadawa.',
+        codeCopied: 'An kwafa lambar!', copyFailed: 'An kasa kwafa lambar',
+        wait: 'Jira', serverName: 'Uwar Garke',
+        spinLabel: 'Juyawa Sa\'a', spinTitle: '🎰 Juyawa Sa\'a', spinSub: 'Juya don samun uwar garke bazuwar!',
+        spinBtn: 'JUYA', spinResult: 'Uwar Garke Sa\'a',
+        autoServerLabel: 'Sabuwar Uwar Garke ta Atomati', randomServerToast: 'An zaɓi uwar garke bazuwar!',
+        notifTitle: 'An Ƙirƙiri Lambar!', notifBody: 'Lambar haɗinka ta shirya',
+        tutorialLabel: 'Koyi',
+        guideWelcome: 'Barka da zuwa! Bari in nuna maka mataki-mataki yadda ake amfani da wannan shafin.',
+        guideLangTitle: 'Zaɓin Harshe',
+        guideLangText: 'Danna nan don canza harshe. Muna tallafawa harsuna da yawa.',
+        guideThemeTitle: 'Launukan Jigo',
+        guideThemeText: 'Danna nan don zaɓa daga <strong>launuka 50 masu kyau</strong> ko ƙirƙiri naka na musamman!',
+        guideServerTitle: 'Uwar Garke ta Atomati',
+        guideServerText: 'Ana <strong>zaɓar uwar garke ta atomati</strong> don mafi kyawun aiki. Danna "Canza" don zaɓa da hannu.',
+        guideAutoTitle: 'Sabuwar Uwar Garke ta Atomati',
+        guideAutoText: 'Danna wannan maɓallin don <strong>zaɓar sabuwar uwar garke bazuwar</strong> kowane lokaci. Gwada!',
+        guidePhoneTitle: 'Shigar da Lambar WhatsApp',
+        guidePhoneText: 'Rubuta lambar WhatsApp ɗinka tare da lambar ƙasa. Misali: <strong>2348xxxxxxxx</strong>',
+        guideBtnTitle: 'Ƙirƙiri Lambar',
+        guideBtnText: 'Danna <strong>wannan babban maɓalli</strong> don ƙirƙirar lambar haɗinka nan take!',
+        guideSkip: 'Tsallake Ziyara', guideNext: 'Na Gane!', guideFinish: 'Kammala',
+        guideQuickActionsTitle: 'Ayyuka Masu Sauri',
+        guideQuickActionsText: 'A nan zaka iya canza <strong>Yanayin Haske/Duhu</strong>, <strong>Sauti</strong>, <strong>Tarihi</strong>, da <strong>Abubuwan So</strong>.',
+        guideHistoryTitle: 'Tarihin Kwanan Nan',
+        guideHistoryText: 'Ana adana lambobin da ka gabata a nan.',
+        shareBtn: 'Raba', retryBtn: 'Sake Gwadawa',
+        codeExpires: 'Lambar ta ƙare cikin', voiceOn: 'Sauti A Kunne', voiceOff: 'Sauti A Kashe',
+        favTitle: 'Abubuwan So', historyTitle: 'Tarihin Kwanan Nan',
+        noFav: 'Babu abubuwan so tukuna. Danna ⭐ akan uwar garke.',
+        noHistory: 'Babu tarihi tukuna.',
+        voiceAnnounce: 'Lambar haɗinka ta shirya',
+        shareText: 'Duba lambar WhatsApp ta',
+        successRateText: 'Adadin Nasara',
+        serverAddedToFav: 'An ƙara uwar garke cikin abubuwan so!',
+        serverRemovedFromFav: 'An cire uwar garke daga abubuwan so'
+      }
+    };
+
+    function t(key) {
+      if (translations[currentLang] && translations[currentLang][key]) {
+        return translations[currentLang][key];
+      }
+      return translations.en[key] || key;
+    }
+
+    let currentLang = 'en';
+    let currentThemeId = 'green';
+    let soundEnabled = true;
+    let isDarkMode = true;
+
+    const $ = (id) => document.getElementById(id);
+    const phoneInput = $('phoneNumber');
+    const generateBtn = $('generateBtn');
+    const generateBtnText = $('generateBtnText');
+    const loading = $('loading');
+    const codeBox = $('codeBox');
+    const copyBtn = $('copyBtn');
+    const copyBtnText = $('copyBtnText');
+    const toast = $('toast');
+    const toastMessage = $('toastMessage');
+    const form = $('pairForm');
+    const serverInfo = $('serverInfo');
+    const serverSelection = $('serverSelection');
+    const serverGrid = $('serverGrid');
+    const currentServerName = $('currentServerName');
+    const serverNameText = $('serverNameText');
+    const autoBadge = $('autoBadge');
+    const activeText = $('activeText');
+    const limitText = $('limitText');
+    const selectBtnText = $('selectBtnText');
+    const langToggle = $('langToggle');
+    const langMenu = $('langMenu');
+    const currentLangLabel = $('currentLangLabel');
+    const themeToggle = $('themeToggle');
+    const themeMenu = $('themeMenu');
+
+    let currentCode = null;
+    let selectedServer = null;
+    let selectedServerStatus = null;
+    let timerInterval = null;
+    let remainingSeconds = 0;
+    let isCooldown = false;
+    let allServers = [];
+    let shuffledServers = [];
+    let isSelectionOpen = false;
+    let isSpinning = false;
+    let autoServerActive = true;
+
+    let codeHistory = [];
+    let favoriteServers = [];
+    let successCount = 0;
+    let failCount = 0;
+
+    let codeTimerInterval = null;
+
+    // ✨ NEW FEATURES VARIABLES
+    let referralCode = '';
+    let referralCount = 0;
+    let referralPoints = 0;
+    let autoRotateEnabled = false;
+    let autoRotateInterval = null;
+    let autoRotateIndex = 0;
+
+    let audioCtx = null;
+    function getAudioCtx() {
+      if (!audioCtx) {
+        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+    function playTone(freq, duration, type = 'sine', volume = 0.15, delay = 0) {
+      if (!soundEnabled) return;
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+      gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + duration);
+    }
+    function playSuccessSound() {
+      playTone(523, 0.15, 'sine', 0.18, 0);
+      playTone(659, 0.15, 'sine', 0.18, 0.1);
+      playTone(784, 0.25, 'sine', 0.18, 0.2);
+      playTone(1046, 0.35, 'sine', 0.18, 0.32);
+    }
+
+    function speakVoice(text) {
+      if (!soundEnabled) return;
+      if (!('speechSynthesis' in window)) return;
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        utterance.volume = 0.8;
+        const voices = window.speechSynthesis.getVoices();
+        const langMap = {
+          'en': 'en-US', 'ur_roman': 'en-IN', 'ur': 'ur-PK', 'ps': 'ps-AF',
+          'fa': 'fa-AF', 'hi': 'hi-IN', 'bn': 'bn-BD', 'sw': 'sw-KE',
+          'ht': 'fr-FR', 'ar_ma': 'ar-MA', 'sw_ug': 'sw-UG', 'ar_sa': 'ar-SA',
+          'ha_ng': 'ha-NG'
+        };
+        const targetLang = langMap[currentLang] || 'en-US';
+        const matchingVoice = voices.find(v => v.lang.startsWith(targetLang.split('-')[0]));
+        if (matchingVoice) utterance.voice = matchingVoice;
+        utterance.lang = targetLang;
+        window.speechSynthesis.speak(utterance);
+      } catch (e) {}
+    }
+
+    async function requestNotificationPermission() {
+      if ('Notification' in window && Notification.permission === 'default') {
+        try { await Notification.requestPermission(); } catch (e) {}
+      }
+    }
+    function showCodeNotification(code) {
+      try {
+        if ('Notification' in window && Notification.permission === 'granted') {
+          const notif = new Notification(t('notifTitle'), {
+            body: t('notifBody') + '\n' + code,
+            tag: 'pair-code'
+          });
+          setTimeout(() => notif.close(), 8000);
+        }
+      } catch (e) {}
+    }
+
+    function autoSelectServer() {
+      if (allServers.length === 0) return;
+      const randomIndex = Math.floor(Math.random() * allServers.length);
+      const server = allServers[randomIndex];
+      selectedServer = server.id;
+      autoServerActive = true;
+      autoBadge.style.display = 'inline-flex';
+      updateSelectedServerUI();
+      updateServerStatus(server.id);
+    }
+    function reselectRandomServer() {
+      if (allServers.length === 0) return;
+      const randomIndex = Math.floor(Math.random() * allServers.length);
+      const server = allServers[randomIndex];
+      selectedServer = server.id;
+      autoServerActive = true;
+      autoBadge.style.display = 'inline-flex';
+      updateSelectedServerUI();
+      updateServerStatus(server.id);
+      const num = server.id.replace('server', '');
+      showToast(`🎲 Random server: Server ${num}`);
+    }
+
+    function buildLangMenu() {
+      langMenu.innerHTML = '';
+      LANGUAGES.forEach(lang => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'lang-option' + (lang.code === currentLang ? ' active' : '');
+        btn.innerHTML = `<span class="flag">${lang.flag}</span><span>${lang.name}</span>`;
+        btn.addEventListener('click', (e) => { e.stopPropagation(); switchLang(lang.code); });
+        langMenu.appendChild(btn);
+      });
+    }
+    function updateLangButtonLabel() { currentLangLabel.textContent = 'Language'; }
+    function switchLang(lang) {
+      currentLang = lang;
+      buildLangMenu();
+      updateLanguageUI();
+      langMenu.classList.remove('show');
+      langToggle.classList.remove('open');
+      try { localStorage.setItem('ahmad_lang', lang); } catch (e) {}
+    }
+    langToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      themeMenu.classList.remove('show');
+      themeToggle.classList.remove('open');
+      langMenu.classList.toggle('show');
+      langToggle.classList.toggle('open');
+    });
+    document.addEventListener('click', () => {
+      langMenu.classList.remove('show');
+      langToggle.classList.remove('open');
+      themeMenu.classList.remove('show');
+      themeToggle.classList.remove('open');
+    });
+    langMenu.addEventListener('click', (e) => e.stopPropagation());
+
+    function buildThemeMenu() {
+      themeMenu.innerHTML = '';
+      THEMES.forEach(theme => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'theme-option' + (theme.id === currentThemeId ? ' active' : '');
+        btn.innerHTML = `<span class="theme-preview" style="background:${theme.preview}"></span><span>${theme.name}</span>`;
+        btn.addEventListener('click', (e) => { e.stopPropagation(); switchTheme(theme.id); });
+        themeMenu.appendChild(btn);
+      });
+
+      const divider = document.createElement('div');
+      divider.className = 'custom-color-divider';
+      themeMenu.appendChild(divider);
+
+      const customPanel = document.createElement('div');
+      customPanel.className = 'custom-theme-panel show';
+      customPanel.innerHTML = `
+        <div style="font-size:11px;font-weight:700;color:var(--brand-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">🎨 Custom Color</div>
+        <div class="custom-theme-row">
+          <label>Main</label>
+          <input type="color" id="customColor1" value="#00c853">
+        </div>
+        <div class="custom-theme-row">
+          <label>Accent</label>
+          <input type="color" id="customColor2" value="#00e676">
+        </div>
+        <button class="custom-theme-apply" type="button" id="applyCustomTheme">Apply Custom Color</button>
+      `;
+      themeMenu.appendChild(customPanel);
+
+      setTimeout(() => {
+        const c1 = document.getElementById('customColor1');
+        const c2 = document.getElementById('customColor2');
+        const applyBtn = document.getElementById('applyCustomTheme');
+        if (c1 && c2 && applyBtn) {
+          applyBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            applyCustomTheme(c1.value, c2.value);
+          });
+        }
+      }, 0);
+    }
+
+    function hexToRgb(hex) {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return `${r},${g},${b}`;
+    }
+
+    function applyCustomTheme(c1, c2) {
+      const ROOT = document.documentElement;
+      ROOT.style.setProperty('--brand-1', c1);
+      ROOT.style.setProperty('--brand-2', c2);
+      ROOT.style.setProperty('--brand-3', c2);
+      ROOT.style.setProperty('--brand-glow', hexToRgb(c1));
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.content = c1;
+      currentThemeId = 'custom';
+      buildThemeMenu();
+      themeMenu.classList.remove('show');
+      themeToggle.classList.remove('open');
+      try {
+        localStorage.setItem('ahmad_theme_id', 'custom');
+        localStorage.setItem('ahmad_custom_c1', c1);
+        localStorage.setItem('ahmad_custom_c2', c2);
+      } catch (e) {}
+      showToast('🎨 Custom color applied!');
+    }
+
+    function switchTheme(themeId) {
+      const theme = THEMES.find(t => t.id === themeId);
+      if (!theme) return;
+      currentThemeId = themeId;
+      const ROOT = document.documentElement;
+      ROOT.style.setProperty('--brand-1', theme.b1);
+      ROOT.style.setProperty('--brand-2', theme.b2);
+      ROOT.style.setProperty('--brand-3', theme.b3);
+      ROOT.style.setProperty('--brand-glow', theme.glow);
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.content = theme.b1;
+      buildThemeMenu();
+      themeMenu.classList.remove('show');
+      themeToggle.classList.remove('open');
+      try { localStorage.setItem('ahmad_theme_id', themeId); } catch (e) {}
+    }
+    themeToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      langMenu.classList.remove('show');
+      langToggle.classList.remove('open');
+      themeMenu.classList.toggle('show');
+      themeToggle.classList.toggle('open');
+    });
+    themeMenu.addEventListener('click', (e) => e.stopPropagation());
+
+    function toggleDarkMode() {
+      isDarkMode = !isDarkMode;
+      document.body.classList.toggle('light-mode', !isDarkMode);
+      const icon = document.getElementById('themeModeIcon');
+      icon.className = isDarkMode ? 'fas fa-moon' : 'fas fa-sun';
+      document.getElementById('themeModeToggle').classList.toggle('active', !isDarkMode);
+      try { localStorage.setItem('ahmad_dark_mode', isDarkMode ? '1' : '0'); } catch (e) {}
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const icon = document.getElementById('soundIcon');
+      icon.className = soundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+      document.getElementById('soundToggle').classList.toggle('active', soundEnabled);
+      try { localStorage.setItem('ahmad_sound', soundEnabled ? '1' : '0'); } catch (e) {}
+      if (soundEnabled) playTone(600, 0.1, 'sine', 0.15, 0);
+    }
+
+    function loadHistory() {
+      try {
+        const saved = localStorage.getItem('ahmad_history');
+        if (saved) codeHistory = JSON.parse(saved) || [];
+      } catch (e) { codeHistory = []; }
+      const savedRate = localStorage.getItem('ahmad_success_count');
+      const savedFail = localStorage.getItem('ahmad_fail_count');
+      successCount = parseInt(savedRate) || 0;
+      failCount = parseInt(savedFail) || 0;
+      updateHistoryUI();
+      updateSuccessRate();
+    }
+    function saveHistory() {
+      try {
+        localStorage.setItem('ahmad_history', JSON.stringify(codeHistory.slice(0, 10)));
+        localStorage.setItem('ahmad_success_count', successCount.toString());
+        localStorage.setItem('ahmad_fail_count', failCount.toString());
+      } catch (e) {}
+    }
+    function addToHistory(code, phone, server) {
+      const item = {
+        code: code,
+        phone: phone,
+        server: server,
+        time: Date.now()
+      };
+      codeHistory.unshift(item);
+      if (codeHistory.length > 10) codeHistory = codeHistory.slice(0, 10);
+      saveHistory();
+      updateHistoryUI();
+    }
+    function updateHistoryUI() {
+      const list = document.getElementById('historyList');
+      const dot = document.getElementById('historyDot');
+      if (!list) return;
+      if (codeHistory.length === 0) {
+        list.innerHTML = `<div class="history-item-info" style="text-align:center;padding:8px;">${t('noHistory')}</div>`;
+        dot.classList.remove('show');
+        return;
+      }
+      dot.classList.add('show');
+      list.innerHTML = '';
+      codeHistory.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'history-item';
+        const date = new Date(item.time);
+        const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        const num = item.server.replace('server', '');
+        el.innerHTML = `
+          <div class="history-item-code">${item.code}</div>
+          <div class="history-item-info">Server ${num} • ${timeStr}</div>
+        `;
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', () => {
+          showCode(item.code);
+          showToast('📋 Code loaded from history');
+        });
+        list.appendChild(el);
+      });
+    }
+
+    function loadFavorites() {
+      try {
+        const saved = localStorage.getItem('ahmad_favorites');
+        if (saved) favoriteServers = JSON.parse(saved) || [];
+      } catch (e) { favoriteServers = []; }
+      updateFavUI();
+    }
+    function saveFavorites() {
+      try { localStorage.setItem('ahmad_favorites', JSON.stringify(favoriteServers)); } catch (e) {}
+    }
+    function toggleFavorite(serverId) {
+      const idx = favoriteServers.indexOf(serverId);
+      if (idx > -1) {
+        favoriteServers.splice(idx, 1);
+        showToast(t('serverRemovedFromFav'));
+      } else {
+        favoriteServers.push(serverId);
+        showToast(t('serverAddedToFav'));
+      }
+      saveFavorites();
+      updateFavUI();
+      refreshServerGrid();
+    }
+    function updateFavUI() {
+      const list = document.getElementById('favList');
+      const dot = document.getElementById('favDot');
+      if (!list) return;
+      if (favoriteServers.length === 0) {
+        list.innerHTML = `<div class="fav-empty">${t('noFav')}</div>`;
+        dot.classList.remove('show');
+        return;
+      }
+      dot.classList.add('show');
+      list.innerHTML = '';
+      favoriteServers.forEach(serverId => {
+        const num = serverId.replace('server', '');
+        const el = document.createElement('div');
+        el.className = 'fav-item';
+        el.innerHTML = `
+          <span class="fav-item-name">⭐ Server ${num}</span>
+          <button class="fav-item-remove" type="button">✕</button>
+        `;
+        el.addEventListener('click', (e) => {
+          if (e.target.classList.contains('fav-item-remove')) return;
+          selectedServer = serverId;
+          autoServerActive = false;
+          autoBadge.style.display = 'none';
+          updateSelectedServerUI();
+          updateServerStatus(serverId);
+          showToast(`⭐ Server ${num} selected`);
+        });
+        el.querySelector('.fav-item-remove').addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleFavorite(serverId);
+        });
+        list.appendChild(el);
+      });
+    }
+
+    // ✨ REFERRAL SYSTEM
+    function initReferral() {
+      try {
+        let saved = localStorage.getItem('ahmad_referral_code');
+        if (!saved) {
+          const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+          const timePart = Date.now().toString(36).slice(-4).toUpperCase();
+          saved = 'AHMAD' + randomPart + timePart.slice(-3);
+          localStorage.setItem('ahmad_referral_code', saved);
+        }
+        referralCode = saved;
+        
+        referralCount = parseInt(localStorage.getItem('ahmad_referral_count') || '0');
+        referralPoints = parseInt(localStorage.getItem('ahmad_referral_points') || '0');
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const refFromUrl = urlParams.get('ref');
+        if (refFromUrl && refFromUrl !== referralCode) {
+          const trackedKey = 'ahmad_ref_tracked_' + refFromUrl;
+          if (!localStorage.getItem(trackedKey)) {
+            localStorage.setItem(trackedKey, '1');
+            setTimeout(() => {
+              showToast('🎉 Welcome! Referred by: ' + refFromUrl);
+            }, 3000);
+          }
+        }
+        
+        updateReferralUI();
+      } catch (e) { console.warn('Referral init error:', e); }
+    }
+
+    function updateReferralUI() {
+      const codeEl = document.getElementById('referralCode');
+      const countEl = document.getElementById('refCount');
+      const pointsEl = document.getElementById('refPoints');
+      const badgeEl = document.getElementById('refBadge');
+      if (codeEl) codeEl.textContent = referralCode || '------';
+      if (countEl) countEl.textContent = referralCount;
+      if (pointsEl) pointsEl.textContent = referralPoints;
+      if (badgeEl) {
+        badgeEl.textContent = referralCount;
+        badgeEl.style.display = referralCount > 0 ? 'block' : 'none';
+      }
+    }
+
+    function copyReferralCode() {
+      if (!referralCode) return;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(referralCode);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = referralCode;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        showToast('📋 Referral code copied!');
+        playTone(700, 0.1, 'sine', 0.15, 0);
+      } catch (e) {
+        showToast('Failed to copy', true);
+      }
+    }
+
+    function shareReferralLink() {
+      if (!referralCode) return;
+      const baseUrl = window.location.origin + window.location.pathname;
+      const shareUrl = `${baseUrl}?ref=${referralCode}`;
+      const shareText = `🎁 Join AHMAD-MD Bot using my referral code: ${referralCode}\n\n${shareUrl}`;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: 'AHMAD-MD Referral',
+          text: shareText,
+          url: shareUrl
+        }).catch(() => {});
+      } else {
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+      }
+    }
+
+    function simulateReferral() {
+      referralCount++;
+      referralPoints += 10;
+      localStorage.setItem('ahmad_referral_count', referralCount.toString());
+      localStorage.setItem('ahmad_referral_points', referralPoints.toString());
+      updateReferralUI();
+      showToast('🎉 New referral added!');
+      playTone(900, 0.15, 'sine', 0.18, 0);
+      playTone(1200, 0.2, 'sine', 0.18, 0.1);
+    }
+
+    // ✨ AUTO THEME ROTATE
+    function toggleAutoRotate() {
+      autoRotateEnabled = !autoRotateEnabled;
+      const icon = document.getElementById('autoRotateIcon');
+      const btn = document.getElementById('autoRotateToggle');
+      
+      if (autoRotateEnabled) {
+        icon.classList.add('auto-rotate-active');
+        btn.classList.add('active');
+        autoRotateIndex = THEMES.findIndex(t => t.id === currentThemeId);
+        if (autoRotateIndex < 0) autoRotateIndex = 0;
+        startAutoRotate();
+        showToast('🎨 Auto theme rotation ON');
+        playTone(800, 0.1, 'sine', 0.15, 0);
+      } else {
+        icon.classList.remove('auto-rotate-active');
+        btn.classList.remove('active');
+        if (autoRotateInterval) {
+          clearInterval(autoRotateInterval);
+          autoRotateInterval = null;
+        }
+        showToast('⏸️ Auto theme rotation OFF');
+        playTone(400, 0.1, 'sine', 0.15, 0);
+      }
+      
+      try { localStorage.setItem('ahmad_auto_rotate', autoRotateEnabled ? '1' : '0'); } catch (e) {}
+    }
+
+    function startAutoRotate() {
+      if (autoRotateInterval) clearInterval(autoRotateInterval);
+      autoRotateInterval = setInterval(() => {
+        if (!autoRotateEnabled) return;
+        autoRotateIndex = (autoRotateIndex + 1) % THEMES.length;
+        switchTheme(THEMES[autoRotateIndex].id);
+      }, 8000);
+    }
+
+    // ✨ HAR BAR NAYA THEME - Random theme on every page load
+    function applyRandomThemeOnLoad() {
+      const savedThemeId = localStorage.getItem('ahmad_theme_id');
+      // Agar user ne custom theme set ki hai to usko rakho
+      if (savedThemeId === 'custom') {
+        const c1 = localStorage.getItem('ahmad_custom_c1') || '#00c853';
+        const c2 = localStorage.getItem('ahmad_custom_c2') || '#00e676';
+        const ROOT = document.documentElement;
+        ROOT.style.setProperty('--brand-1', c1);
+        ROOT.style.setProperty('--brand-2', c2);
+        ROOT.style.setProperty('--brand-3', c2);
+        ROOT.style.setProperty('--brand-glow', hexToRgb(c1));
+        currentThemeId = 'custom';
+        return;
+      }
+      
+      // Random theme select karein har page load par
+      const randomTheme = THEMES[Math.floor(Math.random() * THEMES.length)];
+      currentThemeId = randomTheme.id;
+      const ROOT = document.documentElement;
+      ROOT.style.setProperty('--brand-1', randomTheme.b1);
+      ROOT.style.setProperty('--brand-2', randomTheme.b2);
+      ROOT.style.setProperty('--brand-3', randomTheme.b3);
+      ROOT.style.setProperty('--brand-glow', randomTheme.glow);
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.content = randomTheme.b1;
+    }
+
+    function updateSuccessRate() {
+      const total = successCount + failCount;
+      const rate = total > 0 ? Math.round((successCount / total) * 100) : 0;
+      const el = document.getElementById('successRate');
+      if (el) {
+        el.innerHTML = `📊 ${t('successRateText')}: <strong>${rate}%</strong> (${successCount}✓ / ${failCount}✗)`;
+        el.classList.add('show');
+      }
+    }
+
+    function startCodeTimer(seconds) {
+      const wrap = document.getElementById('codeTimerWrap');
+      const fill = document.getElementById('codeTimerFill');
+      const value = document.getElementById('codeTimerValue');
+      if (!wrap || !fill || !value) return;
+      wrap.classList.add('show');
+      let remaining = seconds;
+      const total = seconds;
+      fill.style.width = '100%';
+      value.textContent = remaining + 's';
+      if (codeTimerInterval) clearInterval(codeTimerInterval);
+      codeTimerInterval = setInterval(() => {
+        remaining--;
+        const percent = (remaining / total) * 100;
+        fill.style.width = Math.max(0, percent) + '%';
+        value.textContent = Math.max(0, remaining) + 's';
+        if (remaining <= 0) {
+          clearInterval(codeTimerInterval);
+          codeTimerInterval = null;
+          wrap.classList.remove('show');
+        }
+      }, 1000);
+    }
+
+    function launchSuccessConfetti() {
+      const container = document.getElementById('confettiContainer');
+      const colors = ['#00c853', '#00e676', '#2196f3', '#ff9800', '#e91e63', '#9c27b0', '#ffc107', '#ff4081'];
+      for (let i = 0; i < 60; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = Math.random() * 0.5 + 's';
+        piece.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+        piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+        container.appendChild(piece);
+        setTimeout(() => piece.remove(), 4000);
+      }
+    }
+
+    function createParticles() {
+      const bg = document.getElementById('particlesBg');
+      if (!bg) return;
+      const count = window.innerWidth < 580 ? 15 : 25;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDuration = (15 + Math.random() * 20) + 's';
+        p.style.animationDelay = Math.random() * 10 + 's';
+        p.style.width = p.style.height = (2 + Math.random() * 4) + 'px';
+        p.style.opacity = 0.2 + Math.random() * 0.3;
+        bg.appendChild(p);
+      }
+    }
+
+    (function setupDarood() {
+      if (sessionStorage.getItem('ahmad_simple_darood') === '1') return;
+      function injectDarood() {
+        const overlay = document.createElement('div');
+        overlay.className = 'simple-darood-overlay';
+        overlay.innerHTML = `
+          <div class="simple-darood-box">
+            <div class="title">✦ درود شریف پڑھ لیں ✦</div>
+            <div class="arabic">صَلَّی اللّٰہُ عَلَیْہِ وَسَلَّمَ</div>
+            <div class="divider"></div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => overlay.classList.add('show'));
+        try { sessionStorage.setItem('ahmad_simple_darood', '1'); } catch (e) {}
+        let isClosed = false;
+        function closeDarood() {
+          if (isClosed) return;
+          isClosed = true;
+          overlay.classList.remove('show');
+          setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 400);
+        }
+        const autoTimer = setTimeout(closeDarood, 2000);
+        overlay.addEventListener('click', () => { clearTimeout(autoTimer); closeDarood(); });
+        overlay.addEventListener('touchstart', () => { clearTimeout(autoTimer); closeDarood(); }, { passive: true });
+      }
+      if ('requestIdleCallback' in window) requestIdleCallback(injectDarood, { timeout: 500 });
+      else setTimeout(injectDarood, 100);
+    })();
+
+    let guideStep = 0;
+    let guideActive = false;
+    const GUIDE_STEPS = [
+      { target: null, titleText: 'Welcome! 👋', text: 'guideWelcome', icon: 'fa-hand-sparkles', position: 'center' },
+      { target: 'quickActions', titleText: '⚡ Quick Actions', text: 'guideQuickActionsText', icon: 'fa-sliders-h', position: 'bottom' },
+      { target: 'langToggle', titleText: '🌍 Language', text: 'guideLangText', icon: 'fa-language', position: 'bottom' },
+      { target: 'themeToggle', titleText: '🎨 Theme Colors', text: 'guideThemeText', icon: 'fa-palette', position: 'bottom' },
+      { target: 'serverInfo', titleText: '⚡ Auto Server', text: 'guideServerText', icon: 'fa-server', position: 'bottom' },
+      { target: 'autoServerBtn', titleText: '🔄 Auto New Server', text: 'guideAutoText', icon: 'fa-sync-alt', position: 'bottom' },
+      { target: 'phoneNumber', titleText: '📱 WhatsApp Number', text: 'guidePhoneText', icon: 'fa-phone', position: 'bottom' },
+      { target: 'generateBtn', titleText: '🔑 Generate Code', text: 'guideBtnText', icon: 'fa-key', position: 'top' },
+      { target: 'historyToggle', titleText: '📜 Recent History', text: 'guideHistoryText', icon: 'fa-history', position: 'bottom' },
+      { target: 'favToggle', titleText: '⭐ Favorites', text: 'guideHistoryText', icon: 'fa-star', position: 'bottom' }
+    ];
+
+    function startInteractiveGuide() {
+      if (localStorage.getItem('ahmad_guide_done') === '1') {
+        document.getElementById('tutorialBtn').classList.remove('hidden');
+        return;
+      }
+      guideActive = true;
+      guideStep = 0;
+      document.getElementById('tutorialBtn').classList.add('hidden');
+      document.getElementById('guideOverlay').classList.add('show');
+      renderGuideStep();
+    }
+
+    function restartGuide() {
+      guideStep = 0;
+      guideActive = true;
+      document.getElementById('tutorialBtn').classList.add('hidden');
+      document.getElementById('guideOverlay').classList.add('show');
+      renderGuideStep();
+    }
+
+    function renderGuideStep() {
+      const step = GUIDE_STEPS[guideStep];
+      const tooltip = document.getElementById('guideTooltip');
+      const highlight = document.getElementById('guideHighlight');
+      const pointer = document.getElementById('guidePointer');
+      const overlay = document.getElementById('guideOverlay');
+
+      document.getElementById('guideStepCount').textContent = `STEP ${guideStep + 1}/${GUIDE_STEPS.length}`;
+      document.getElementById('guideIcon').className = `fas ${step.icon}`;
+      document.getElementById('guideTitle').textContent = step.titleText;
+      document.getElementById('guideText').innerHTML = t(step.text);
+
+      const nextText = document.getElementById('guideNextText');
+      if (guideStep === GUIDE_STEPS.length - 1) nextText.textContent = t('guideFinish');
+      else nextText.textContent = t('guideNext');
+
+      if (!step.target) {
+        highlight.style.display = 'none';
+        pointer.style.display = 'none';
+        overlay.style.background = 'rgba(0,0,0,0.85)';
+        tooltip.className = 'guide-tooltip show pos-top';
+        tooltip.style.left = '50%';
+        tooltip.style.top = '50%';
+        tooltip.style.transform = 'translate(-50%, -50%) scale(1)';
+        tooltip.style.position = 'fixed';
+        return;
+      }
+
+      overlay.style.background = 'rgba(0,0,0,0.75)';
+      let target;
+      if (step.target === 'autoServerBtn') target = document.getElementById('autoServerBtn');
+      else if (step.target === 'quickActions') target = document.querySelector('.quick-actions');
+      else target = document.getElementById(step.target);
+
+      if (!target) { nextGuideStep(); return; }
+
+      const rect = target.getBoundingClientRect();
+
+      highlight.style.display = 'block';
+      highlight.style.left = (rect.left - 8) + 'px';
+      highlight.style.top = (rect.top - 8) + 'px';
+      highlight.style.width = (rect.width + 16) + 'px';
+      highlight.style.height = (rect.height + 16) + 'px';
+
+      pointer.style.display = 'block';
+      pointer.style.left = (rect.left + rect.width / 2 - 20) + 'px';
+      pointer.style.top = (rect.top + rect.height / 2 - 30) + 'px';
+
+      tooltip.className = 'guide-tooltip show';
+      tooltip.style.position = 'fixed';
+      tooltip.style.transform = 'scale(1)';
+
+      const tooltipWidth = 300;
+      const tooltipHeight = 230;
+      const padding = 16;
+      let top, left;
+      const isMobile = window.innerWidth < 580;
+
+      if (step.position === 'bottom' || (isMobile && rect.top < 200)) {
+        top = rect.bottom + padding + 20;
+        left = Math.max(10, Math.min(window.innerWidth - tooltipWidth - 10, rect.left + rect.width / 2 - tooltipWidth / 2));
+        tooltip.classList.add('pos-bottom');
+        tooltip.classList.remove('pos-top', 'pos-left', 'pos-right');
+        if (top + tooltipHeight > window.innerHeight) {
+          top = rect.top - tooltipHeight - padding - 20;
+          tooltip.classList.remove('pos-bottom');
+          tooltip.classList.add('pos-top');
+        }
+      } else if (step.position === 'top') {
+        top = rect.top - tooltipHeight - padding - 20;
+        left = Math.max(10, Math.min(window.innerWidth - tooltipWidth - 10, rect.left + rect.width / 2 - tooltipWidth / 2));
+        tooltip.classList.add('pos-top');
+        tooltip.classList.remove('pos-bottom', 'pos-left', 'pos-right');
+        if (top < 10) {
+          top = rect.bottom + padding + 20;
+          tooltip.classList.remove('pos-top');
+          tooltip.classList.add('pos-bottom');
+        }
+      } else {
+        top = Math.max(10, rect.top + rect.height / 2 - tooltipHeight / 2);
+        left = rect.left - tooltipWidth - padding - 20;
+        tooltip.classList.add('pos-left');
+        tooltip.classList.remove('pos-top', 'pos-bottom', 'pos-right');
+      }
+
+      top = Math.max(10, Math.min(window.innerHeight - tooltipHeight - 10, top));
+      left = Math.max(10, Math.min(window.innerWidth - tooltipWidth - 10, left));
+
+      tooltip.style.top = top + 'px';
+      tooltip.style.left = left + 'px';
+    }
+
+    function nextGuideStep() {
+      if (guideStep < GUIDE_STEPS.length - 1) { guideStep++; renderGuideStep(); }
+      else finishGuide();
+    }
+    function skipGuide() { finishGuide(); }
+    function finishGuide() {
+      guideActive = false;
+      document.getElementById('guideOverlay').classList.remove('show');
+      document.getElementById('guideHighlight').style.display = 'none';
+      document.getElementById('guidePointer').style.display = 'none';
+      document.getElementById('guideTooltip').classList.remove('show');
+      document.getElementById('tutorialBtn').classList.remove('hidden');
+      try { localStorage.setItem('ahmad_guide_done', '1'); } catch (e) {}
+    }
+    window.addEventListener('resize', () => { if (guideActive) renderGuideStep(); });
+    window.addEventListener('scroll', () => { if (guideActive) renderGuideStep(); });
+
+    function updateLanguageUI() {
+      $('subtitleText').textContent = t('subtitle');
+      selectBtnText.textContent = t('serverSelectBtn');
+      $('serverSelectionTitle').textContent = t('serverSelectionTitle');
+      $('quickSetupTitle').textContent = t('quickSetupTitle');
+      $('quickSetupDesc').textContent = t('quickSetupDesc');
+      $('phoneLabel').textContent = t('phoneLabel');
+      $('phoneHint').textContent = t('phoneHint');
+      $('loadingText').textContent = t('loadingText');
+      copyBtnText.textContent = t('copyBtn');
+      $('footerText').textContent = t('footerText');
+      $('spinLabel').textContent = t('spinLabel');
+      $('spinTitle').textContent = t('spinTitle');
+      $('spinSub').textContent = t('spinSub');
+      $('spinBtnText').textContent = t('spinBtn');
+      $('autoServerLabel').textContent = t('autoServerLabel');
+      $('tutorialLabel').textContent = t('tutorialLabel');
+      const shareTextEl = document.querySelector('#shareBtn span');
+      if (shareTextEl) shareTextEl.textContent = t('shareBtn');
+      const retryTextEl = document.querySelector('#retryBtn span');
+      if (retryTextEl) retryTextEl.textContent = t('retryBtn');
+      const timerLabel = document.getElementById('codeTimerLabel');
+      if (timerLabel) timerLabel.textContent = t('codeExpires');
+      const favTitle = document.getElementById('favTitleText');
+      if (favTitle) favTitle.textContent = t('favTitle');
+      const histTitle = document.getElementById('historyTitleText');
+      if (histTitle) histTitle.textContent = t('historyTitle');
+
+      if (!isCooldown) generateBtnText.textContent = t('generateBtn');
+      else generateBtnText.textContent = `${t('wait')} ${remainingSeconds}s`;
+      if (!codeBox.classList.contains('has-code') && !codeBox.classList.contains('has-error')) {
+        $('codePlaceholder').textContent = t('codePlaceholder');
+      }
+      if (selectedServer) {
+        const num = selectedServer.replace('server', '');
+        serverNameText.textContent = `${t('serverName')} ${num}`;
+      } else {
+        serverNameText.textContent = t('serverSelect');
+      }
+      if (selectedServerStatus) {
+        activeText.textContent = `${t('active')}: ${selectedServerStatus.count}`;
+        limitText.textContent = `${t('limit')}: ${selectedServerStatus.count}/${selectedServerStatus.limit}`;
+      } else {
+        activeText.textContent = `${t('active')}: --`;
+        limitText.textContent = `${t('limit')}: --/50`;
+      }
+      const langInfo = LANGUAGES.find(l => l.code === currentLang);
+      const isRTL = langInfo && langInfo.rtl;
+      document.body.classList.toggle('urdu', isRTL);
+      document.documentElement.lang = currentLang;
+      document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+      if (isSelectionOpen && shuffledServers.length > 0) refreshServerGrid();
+      if (guideActive) renderGuideStep();
+      updateFavUI();
+      updateHistoryUI();
+      updateSuccessRate();
+    }
+
+    function refreshServerGrid() {
+      if (shuffledServers.length === 0) return;
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < shuffledServers.length; i++) {
+        const server = shuffledServers[i];
+        const el = document.createElement('div');
+        el.className = 'server-option' + (selectedServer === server.id ? ' selected' : '');
+        el.dataset.server = server.id;
+        const isFav = favoriteServers.indexOf(server.id) > -1;
+        const name = document.createElement('div');
+        name.className = 'server-option-name';
+        name.innerHTML = `${server.name} ${isFav ? '⭐' : ''}`;
+        const stats = document.createElement('div');
+        stats.className = 'server-option-stats';
+        stats.innerHTML = `<span style="cursor:pointer;" data-fav="${server.id}">${isFav ? '★' : '☆'}</span> ${t('clickToSelect')}`;
+        el.appendChild(name);
+        el.appendChild(stats);
+        frag.appendChild(el);
+      }
+      serverGrid.replaceChildren(frag);
+    }
+
+    serverGrid.addEventListener('click', (e) => {
+      if (e.target.dataset.fav) {
+        e.stopPropagation();
+        toggleFavorite(e.target.dataset.fav);
+        return;
+      }
+      const opt = e.target.closest('.server-option');
+      if (opt && opt.dataset.server) selectServer(opt.dataset.server);
+    });
+
+    function shuffleArray(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a;
+    }
+    function generateDefaultServers() {
+      const arr = [];
+      for (let i = 1; i <= 55; i++) arr.push({ id: 'server' + i, name: 'Server ' + i });
+      return arr;
+    }
+
+    async function loadServers() {
+      try {
+        const cached = sessionStorage.getItem('ahmad_servers');
+        const cachedTime = sessionStorage.getItem('ahmad_servers_time');
+        if (cached && cachedTime && (Date.now() - parseInt(cachedTime) < 120000)) {
+          const data = JSON.parse(cached);
+          if (Array.isArray(data) && data.length > 0) {
+            allServers = data; shuffledServers = shuffleArray(allServers);
+            refreshServerGrid();
+            if (!selectedServer) autoSelectServer();
+            return;
+          }
+        }
+      } catch (e) {}
+      allServers = generateDefaultServers();
+      shuffledServers = shuffleArray(allServers);
+      refreshServerGrid();
+      if (!selectedServer) autoSelectServer();
+      try {
+        if (typeof axios === 'undefined') return;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+        const response = await axios.get('/api/servers', { signal: controller.signal });
+        clearTimeout(timeoutId);
+        const servers = response.data && response.data.servers;
+        if (Array.isArray(servers) && servers.length > 0) {
+          allServers = servers;
+          shuffledServers = shuffleArray(allServers);
+          try {
+            sessionStorage.setItem('ahmad_servers', JSON.stringify(allServers));
+            sessionStorage.setItem('ahmad_servers_time', Date.now().toString());
+          } catch (e) {}
+          if (isSelectionOpen) refreshServerGrid();
+        }
+      } catch (error) {}
+    }
+
+    function showServerSelection() {
+      serverInfo.style.display = 'none';
+      serverSelection.style.display = 'block';
+      serverSelection.classList.add('show');
+      isSelectionOpen = true;
+      refreshServerGrid();
+    }
+    function hideServerSelection() {
+      serverInfo.style.display = 'flex';
+      serverSelection.style.display = 'none';
+      serverSelection.classList.remove('show');
+      isSelectionOpen = false;
+    }
+
+    async function selectServer(serverId) {
+      selectedServer = serverId;
+      autoServerActive = false;
+      autoBadge.style.display = 'none';
+      hideServerSelection();
+      updateSelectedServerUI();
+      await updateServerStatus(serverId);
+    }
+
+    async function updateServerStatus(serverId) {
+      try {
+        if (typeof axios === 'undefined') throw new Error('axios not loaded');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const response = await axios.get(`/api/status/${serverId}`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        selectedServerStatus = { count: response.data.count || 0, limit: response.data.limit || 50 };
+      } catch (error) {
+        selectedServerStatus = { count: 0, limit: 50 };
+      }
+      updateSelectedServerUI();
+    }
+
+    function updateSelectedServerUI() {
+      if (selectedServer) {
+        const num = selectedServer.replace('server', '');
+        serverNameText.textContent = `${t('serverName')} ${num}`;
+      }
+      if (selectedServerStatus) {
+        activeText.textContent = `${t('active')}: ${selectedServerStatus.count}`;
+        limitText.textContent = `${t('limit')}: ${selectedServerStatus.count}/${selectedServerStatus.limit}`;
+      }
+      if (!isCooldown) {
+        generateBtn.disabled = false;
+        generateBtnText.textContent = t('generateBtn');
+      } else {
+        generateBtn.disabled = true;
+        generateBtnText.textContent = `${t('wait')} ${remainingSeconds}s`;
+      }
+      const opts = serverGrid.querySelectorAll('.server-option');
+      for (let i = 0; i < opts.length; i++) {
+        opts[i].classList.toggle('selected', opts[i].dataset.server === selectedServer);
+      }
+    }
+
+    let toastTimer = null;
+    function showToast(message, isError = false) {
+      if (toastTimer) clearTimeout(toastTimer);
+      const icon = toast.querySelector('i');
+      icon.className = isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+      toastMessage.textContent = message;
+      toast.className = 'toast' + (isError ? ' error' : '') + ' show';
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    function validatePhone(number) {
+      const cleaned = number.replace(/[^\d]/g, '');
+      return cleaned.length >= 10 && cleaned.length <= 15;
+    }
+    function showError(message) {
+      codeBox.className = 'code-box has-error';
+      codeBox.innerHTML = '<div class="error-value"><i class="fas fa-exclamation-circle"></i><span></span></div>';
+      codeBox.querySelector('span').textContent = message;
+      document.getElementById('actionRow').classList.remove('show');
+    }
+    function showCode(code) {
+      currentCode = code;
+      codeBox.className = 'code-box has-code';
+      codeBox.innerHTML = '<div class="code-value"><i class="fas fa-check-circle"></i><span></span></div>';
+      codeBox.querySelector('span').textContent = code;
+      document.getElementById('actionRow').classList.add('show');
+    }
+    function resetCodeBox() {
+      codeBox.className = 'code-box';
+      codeBox.innerHTML = '<div class="code-placeholder" id="codePlaceholder"></div>';
+      codeBox.querySelector('.code-placeholder').textContent = t('codePlaceholder');
+      document.getElementById('actionRow').classList.remove('show');
+      document.getElementById('codeTimerWrap').classList.remove('show');
+      currentCode = null;
+    }
+
+    function startCooldown(seconds) {
+      if (timerInterval) clearInterval(timerInterval);
+      isCooldown = true;
+      remainingSeconds = seconds;
+      generateBtn.disabled = true;
+      generateBtnText.textContent = `${t('wait')} ${remainingSeconds}s`;
+      timerInterval = setInterval(() => {
+        remainingSeconds--;
+        if (remainingSeconds <= 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          isCooldown = false;
+          if (selectedServer) {
+            generateBtn.disabled = false;
+            generateBtnText.textContent = t('generateBtn');
+            updateServerStatus(selectedServer);
+          }
+        } else {
+          generateBtnText.textContent = `${t('wait')} ${remainingSeconds}s`;
+        }
+      }, 1000);
+    }
+
+    async function generatePairCode(e) {
+      e.preventDefault();
+      if (!selectedServer) {
+        autoSelectServer();
+        await new Promise(r => setTimeout(r, 500));
+      }
+      if (!selectedServer) { showError(t('selectServerFirst')); return; }
+      const phoneNumber = phoneInput.value.trim();
+      if (!phoneNumber) { showError(t('enterPhone')); showToast(t('phoneRequired'), true); return; }
+      if (!validatePhone(phoneNumber)) { showError(t('validPhoneError')); showToast(t('invalidPhone'), true); return; }
+
+      generateBtn.disabled = true;
+      generateBtn.style.display = 'none';
+      loading.style.display = 'block';
+      resetCodeBox();
+
+      try {
+        if (typeof axios === 'undefined') throw new Error('Network library not loaded');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+        const response = await axios.get('/api/code', {
+          params: { server: selectedServer, number: phoneNumber.replace(/[^\d]/g, '') },
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (response.data && response.data.code) {
+          showCode(response.data.code);
+          showToast(t('codeSuccess'));
+          playSuccessSound();
+          launchSuccessConfetti();
+          speakVoice(t('voiceAnnounce') + '. ' + response.data.code.split('').join(' '));
+          showCodeNotification(response.data.code);
+          addToHistory(response.data.code, phoneNumber, selectedServer);
+          successCount++;
+          updateSuccessRate();
+          saveHistory();
+          startCodeTimer(30);
+          updateServerStatus(selectedServer);
+          startCooldown(30);
+        } else {
+          throw new Error((response.data && response.data.error) || t('failedGenerate'));
+        }
+      } catch (error) {
+        failCount++;
+        updateSuccessRate();
+        saveHistory();
+        const msg = error.name === 'AbortError' ? 'Request timed out.' : (error.response?.data?.error || error.message || t('failedGenerate'));
+        showError(msg);
+        showToast(t('errorGenerating'), true);
+      } finally {
+        generateBtn.style.display = 'flex';
+        loading.style.display = 'none';
+        if (!isCooldown) {
+          generateBtn.disabled = false;
+          generateBtnText.textContent = t('generateBtn');
+        }
+      }
+    }
+
+    async function copyCode() {
+      if (!currentCode) return;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(currentCode);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = currentCode;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        copyBtnText.textContent = t('copiedBtn');
+        copyBtn.disabled = true;
+        showToast(t('codeCopied'));
+        setTimeout(() => {
+          copyBtnText.textContent = t('copyBtn');
+          copyBtn.disabled = false;
+        }, 2000);
+      } catch (error) {
+        showToast(t('copyFailed'), true);
+      }
+    }
+
+    function shareCode() {
+      if (!currentCode) return;
+      const text = `${t('shareText')}: ${currentCode}`;
+      if (navigator.share) {
+        navigator.share({ title: 'AHMAD-MD Pair Code', text: text }).catch(() => {});
+      } else {
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+      }
+    }
+
+    function retryGenerate() {
+      if (isCooldown) return;
+      form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    }
+
+    form.addEventListener('submit', generatePairCode);
+    document.getElementById('copyBtn').addEventListener('click', copyCode);
+    document.getElementById('shareBtn').addEventListener('click', shareCode);
+    document.getElementById('retryBtn').addEventListener('click', retryGenerate);
+    serverInfo.addEventListener('click', showServerSelection);
+    document.getElementById('themeModeToggle').addEventListener('click', toggleDarkMode);
+    document.getElementById('soundToggle').addEventListener('click', toggleSound);
+
+    function closeAllPanels(except) {
+      ['historyPanel','favPanel','referralPanel'].forEach(id => {
+        if (id !== except) document.getElementById(id).classList.remove('show');
+      });
+    }
+
+    document.getElementById('historyToggle').addEventListener('click', () => {
+      const p = document.getElementById('historyPanel');
+      const s = p.classList.toggle('show');
+      if (s) closeAllPanels('historyPanel');
+    });
+    document.getElementById('favToggle').addEventListener('click', () => {
+      const p = document.getElementById('favPanel');
+      const s = p.classList.toggle('show');
+      if (s) closeAllPanels('favPanel');
+    });
+    document.getElementById('referralToggle').addEventListener('click', () => {
+      const p = document.getElementById('referralPanel');
+      const s = p.classList.toggle('show');
+      if (s) closeAllPanels('referralPanel');
+    });
+    document.getElementById('historyClear').addEventListener('click', () => {
+      codeHistory = [];
+      saveHistory();
+      updateHistoryUI();
+      showToast('History cleared');
+    });
+
+    // ✨ NEW FEATURE EVENT LISTENERS
+    document.getElementById('autoRotateToggle').addEventListener('click', toggleAutoRotate);
+    document.getElementById('copyReferralBtn').addEventListener('click', copyReferralCode);
+    document.getElementById('shareReferralBtn').addEventListener('click', shareReferralLink);
+
+    // Hidden: Simulate referral (5 clicks on ref badge)
+    let badgeClicks = 0;
+    document.getElementById('refBadge').addEventListener('click', (e) => {
+      e.stopPropagation();
+      badgeClicks++;
+      if (badgeClicks >= 5) {
+        simulateReferral();
+        badgeClicks = 0;
+      }
+    });
+
+    phoneInput.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/[^\d]/g, '');
+    });
+    phoneInput.addEventListener('focus', () => {
+      if (codeBox.classList.contains('has-error')) resetCodeBox();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!isSelectionOpen) return;
+      if (!serverSelection.contains(e.target) && !serverInfo.contains(e.target)) {
+        hideServerSelection();
+      }
+    });
+
+    function openSpinWheel() {
+      const modal = document.getElementById('spinModal');
+      modal.classList.add('show');
+      buildWheelLabels();
+    }
+    function closeSpinWheel() {
+      document.getElementById('spinModal').classList.remove('show');
+    }
+    function buildWheelLabels() {
+      const wheel = document.getElementById('spinWheel');
+      wheel.querySelectorAll('.spin-wheel-label').forEach(l => l.remove());
+      const labels = ['S1', 'S7', 'S13', 'S19', 'S25', 'S31', 'S37', 'S43'];
+      const radius = 95;
+      for (let i = 0; i < 8; i++) {
+        const angle = i * 45 + 22.5;
+        const rad = (angle - 90) * Math.PI / 180;
+        const x = Math.cos(rad) * radius;
+        const y = Math.sin(rad) * radius;
+        const label = document.createElement('div');
+        label.className = 'spin-wheel-label';
+        label.textContent = labels[i];
+        label.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+        wheel.appendChild(label);
+      }
+    }
+
+    let spinRotation = 0;
+    function spinWheel() {
+      if (isSpinning) return;
+      isSpinning = true;
+      const wheel = document.getElementById('spinWheel');
+      const btn = document.getElementById('spinBtn');
+      const result = document.getElementById('spinResult');
+      btn.disabled = true;
+      result.textContent = '';
+      const extraTurns = 5 + Math.floor(Math.random() * 4);
+      const extraAngle = Math.floor(Math.random() * 360);
+      spinRotation += extraTurns * 360 + extraAngle;
+      wheel.style.transform = `rotate(${spinRotation}deg)`;
+      setTimeout(() => {
+        const normalizedAngle = (360 - (spinRotation % 360)) % 360;
+        const segmentIndex = Math.floor(normalizedAngle / 45);
+        const selectedServerNum = [1, 7, 13, 19, 25, 31, 37, 43][segmentIndex] || 1;
+        result.textContent = `🎉 ${t('spinResult')}: Server ${selectedServerNum}`;
+        launchConfetti();
+        setTimeout(() => {
+          selectedServer = 'server' + selectedServerNum;
+          autoServerActive = false;
+          autoBadge.style.display = 'none';
+          closeSpinWheel();
+          updateSelectedServerUI();
+          updateServerStatus(selectedServer);
+          showToast(`🎯 Server ${selectedServerNum} selected!`);
+        }, 1200);
+        isSpinning = false;
+        btn.disabled = false;
+      }, 4100);
+    }
+
+    function launchConfetti() {
+      const container = document.getElementById('spinContainer');
+      const colors = ['#00c853', '#00e676', '#2196f3', '#ff9800', '#e91e63', '#9c27b0', '#ffc107'];
+      for (let i = 0; i < 40; i++) {
+        const conf = document.createElement('div');
+        conf.className = 'confetti';
+        conf.style.left = Math.random() * 100 + '%';
+        conf.style.background = colors[Math.floor(Math.random() * colors.length)];
+        conf.style.animation = `confettiFall ${1.5 + Math.random() * 1.5}s ease-out forwards`;
+        conf.style.animationDelay = Math.random() * 0.5 + 's';
+        conf.style.transform = `rotate(${Math.random() * 360}deg)`;
+        container.appendChild(conf);
+        setTimeout(() => conf.remove(), 3500);
+      }
+    }
+
+    document.getElementById('spinModal').addEventListener('click', (e) => {
+      if (e.target.id === 'spinModal') closeSpinWheel();
+    });
+
+    function init() {
+      try {
+        const savedLang = localStorage.getItem('ahmad_lang');
+        if (savedLang && LANGUAGES.find(l => l.code === savedLang)) currentLang = savedLang;
+
+        const savedDark = localStorage.getItem('ahmad_dark_mode');
+        if (savedDark !== null) {
+          isDarkMode = savedDark === '1';
+          document.body.classList.toggle('light-mode', !isDarkMode);
+          const icon = document.getElementById('themeModeIcon');
+          icon.className = isDarkMode ? 'fas fa-moon' : 'fas fa-sun';
+          document.getElementById('themeModeToggle').classList.toggle('active', !isDarkMode);
+        }
+
+        const savedSound = localStorage.getItem('ahmad_sound');
+        if (savedSound !== null) {
+          soundEnabled = savedSound === '1';
+          const icon = document.getElementById('soundIcon');
+          icon.className = soundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+          document.getElementById('soundToggle').classList.toggle('active', soundEnabled);
+        } else {
+          document.getElementById('soundToggle').classList.add('active');
+        }
+      } catch (e) {}
+
+      // ✨ Har bar page load par random theme apply karein
+      applyRandomThemeOnLoad();
+
+      buildLangMenu();
+      buildThemeMenu();
+      updateLangButtonLabel();
+      loadHistory();
+      loadFavorites();
+      updateLanguageUI();
+
+      // ✨ NEW FEATURES INIT
+      initReferral();
+      
+      // Auto rotate restore
+      try {
+        const savedRotate = localStorage.getItem('ahmad_auto_rotate');
+        if (savedRotate === '1') {
+          setTimeout(() => {
+            autoRotateEnabled = false;
+            toggleAutoRotate();
+          }, 1500);
+        }
+      } catch (e) {}
+
+      createParticles();
+
+      allServers = generateDefaultServers();
+      shuffledServers = shuffleArray(allServers);
+      refreshServerGrid();
+      autoSelectServer();
+
+      const schedule = window.requestIdleCallback || function (cb) { return setTimeout(cb, 200); };
+      schedule(loadServers);
+
+      setTimeout(requestNotificationPermission, 2000);
+      setTimeout(startInteractiveGuide, 1800);
+    }
+
+    window.showServerSelection = showServerSelection;
+    window.openSpinWheel = openSpinWheel;
+    window.closeSpinWheel = closeSpinWheel;
+    window.spinWheel = spinWheel;
+    window.nextGuideStep = nextGuideStep;
+    window.skipGuide = skipGuide;
+    window.reselectRandomServer = reselectRandomServer;
+    window.restartGuide = restartGuide;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>
